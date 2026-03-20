@@ -16,6 +16,8 @@ import { KPI_OVERVIEW, RECETTES_DATA } from "@/lib/mock-data";
 import { Badge } from "@/components/ui/badge";
 
 export default function DashboardOverview() {
+  const hasData = RECETTES_DATA.length > 0;
+
   return (
     <div className="space-y-8">
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
@@ -24,7 +26,7 @@ export default function DashboardOverview() {
           <p className="text-muted-foreground">Bienvenue, Directrice. Voici l'état actuel de la pharmacie.</p>
         </div>
         <div className="flex items-center gap-2">
-          <Badge variant="outline" className="px-3 py-1 bg-white">Mise à jour: Aujourd'hui, 14:30</Badge>
+          <Badge variant="outline" className="px-3 py-1 bg-white">Mise à jour: Temps réel</Badge>
         </div>
       </div>
 
@@ -37,9 +39,8 @@ export default function DashboardOverview() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{KPI_OVERVIEW.entreesMois.toLocaleString()} F CFA</div>
-            <div className="flex items-center text-xs text-green-600 mt-1 font-medium">
-              <TrendingUp className="h-3 w-3 mr-1" />
-              +12% vs mois dernier
+            <div className="flex items-center text-xs text-muted-foreground mt-1 font-medium">
+              Aucune évolution calculée
             </div>
           </CardContent>
         </Card>
@@ -52,9 +53,8 @@ export default function DashboardOverview() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{KPI_OVERVIEW.sortiesMois.toLocaleString()} F CFA</div>
-            <div className="flex items-center text-xs text-green-600 mt-1 font-medium">
-              <TrendingDown className="h-3 w-3 mr-1" />
-              -8% vs mois dernier
+            <div className="flex items-center text-xs text-muted-foreground mt-1 font-medium">
+              Aucune évolution calculée
             </div>
           </CardContent>
         </Card>
@@ -67,9 +67,8 @@ export default function DashboardOverview() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{(KPI_OVERVIEW.entreesMois - KPI_OVERVIEW.sortiesMois).toLocaleString()} F CFA</div>
-            <div className="flex items-center text-xs text-green-600 mt-1 font-medium">
-              <TrendingUp className="h-3 w-3 mr-1" />
-              +15% vs mois dernier
+            <div className="flex items-center text-xs text-muted-foreground mt-1 font-medium">
+              En attente de données
             </div>
           </CardContent>
         </Card>
@@ -81,10 +80,9 @@ export default function DashboardOverview() {
             <Info className="h-4 w-4 text-red-400" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">3 200 F CFA</div>
-            <div className="flex items-center text-xs text-red-600 mt-1 font-medium">
-              <TrendingDown className="h-3 w-3 mr-1" />
-              +5% d'anomalies
+            <div className="text-2xl font-bold">0 F CFA</div>
+            <div className="flex items-center text-xs text-muted-foreground mt-1 font-medium">
+              Aucune anomalie détectée
             </div>
           </CardContent>
         </Card>
@@ -94,24 +92,28 @@ export default function DashboardOverview() {
         <Card className="border-none shadow-md">
           <CardHeader>
             <CardTitle>Evolution Entrées vs Sorties</CardTitle>
-            <CardDescription>Comparaison journalière sur les 7 derniers jours (F CFA)</CardDescription>
+            <CardDescription>Comparaison journalière (F CFA)</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="h-[450px]">
-              <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={RECETTES_DATA}>
-                  <CartesianGrid strokeDasharray="3 3" vertical={false} />
-                  <XAxis dataKey="period" />
-                  <YAxis />
-                  <Tooltip 
-                    formatter={(value) => [`${value.toLocaleString()} F CFA`]}
-                    contentStyle={{ backgroundColor: '#fff', borderRadius: '8px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}
-                  />
-                  <Legend />
-                  <Line type="monotone" dataKey="brute" name="Ventes" stroke="hsl(var(--primary))" strokeWidth={3} dot={{ r: 4 }} activeDot={{ r: 6 }} />
-                  <Line type="monotone" dataKey="tierPayant" name="Commandes" stroke="hsl(var(--secondary))" strokeWidth={3} dot={{ r: 4 }} />
-                </LineChart>
-              </ResponsiveContainer>
+            <div className="h-[450px] flex items-center justify-center">
+              {hasData ? (
+                <ResponsiveContainer width="100%" height="100%">
+                  <LineChart data={RECETTES_DATA}>
+                    <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                    <XAxis dataKey="period" />
+                    <YAxis />
+                    <Tooltip 
+                      formatter={(value) => [`${value.toLocaleString()} F CFA`]}
+                      contentStyle={{ backgroundColor: '#fff', borderRadius: '8px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}
+                    />
+                    <Legend />
+                    <Line type="monotone" dataKey="brute" name="Ventes" stroke="hsl(var(--primary))" strokeWidth={3} dot={{ r: 4 }} activeDot={{ r: 6 }} />
+                    <Line type="monotone" dataKey="tierPayant" name="Commandes" stroke="hsl(var(--secondary))" strokeWidth={3} dot={{ r: 4 }} />
+                  </LineChart>
+                </ResponsiveContainer>
+              ) : (
+                <p className="text-muted-foreground italic">Aucune donnée disponible pour le graphique.</p>
+              )}
             </div>
           </CardContent>
         </Card>
