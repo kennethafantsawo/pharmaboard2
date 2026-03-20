@@ -101,7 +101,7 @@ export default function SettingsPage() {
               </div>
               <div className="space-y-2">
                 <Label>Devise par défaut</Label>
-                <Input defaultValue="EUR (€)" />
+                <Input defaultValue="F CFA" />
               </div>
               <Button className="w-full">Enregistrer</Button>
             </CardContent>

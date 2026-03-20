@@ -34,7 +34,7 @@ export default function DcssaPage() {
                     <CartesianGrid strokeDasharray="3 3" vertical={false} />
                     <XAxis dataKey="mois" />
                     <YAxis />
-                    <Tooltip />
+                    <Tooltip formatter={(value) => [`${value.toLocaleString()} F CFA`]} />
                     <Bar dataKey="montant" name="Montant Consommé" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} />
                   </BarChart>
                 </ResponsiveContainer>
@@ -56,9 +56,9 @@ export default function DcssaPage() {
                 {DCSSA_DATA.map((row) => (
                   <TableRow key={row.mois}>
                     <TableCell className="font-medium">{row.mois}</TableCell>
-                    <TableCell className="text-right">{row.montant.toLocaleString()} €</TableCell>
+                    <TableCell className="text-right">{row.montant.toLocaleString()} F CFA</TableCell>
                     <TableCell className="text-right">{row.dossiers}</TableCell>
-                    <TableCell className="text-right font-bold text-primary">{row.solde.toLocaleString()} €</TableCell>
+                    <TableCell className="text-right font-bold text-primary">{row.solde.toLocaleString()} F CFA</TableCell>
                   </TableRow>
                 ))}
               </TableBody>

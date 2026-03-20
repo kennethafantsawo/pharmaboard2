@@ -110,23 +110,23 @@ export default function AdminDataPage() {
                 </div>
                 <div className="space-y-2">
                   <Label>Recette Brute (Comptants)</Label>
-                  <Input type="number" placeholder="0.00 €" />
+                  <Input type="number" placeholder="0 F CFA" />
                 </div>
                 <div className="space-y-2">
                   <Label>Part Assurée (Recette)</Label>
-                  <Input type="number" placeholder="0.00 €" />
+                  <Input type="number" placeholder="0 F CFA" />
                 </div>
                 <div className="space-y-2">
                   <Label>Tiers Payant</Label>
-                  <Input type="number" placeholder="0.00 €" />
+                  <Input type="number" placeholder="0 F CFA" />
                 </div>
                 <div className="space-y-2">
                   <Label>Crédits Patients</Label>
-                  <Input type="number" placeholder="0.00 €" />
+                  <Input type="number" placeholder="0 F CFA" />
                 </div>
                 <div className="space-y-2">
                   <Label>Remises Autorisées</Label>
-                  <Input type="number" placeholder="0.00 €" />
+                  <Input type="number" placeholder="0 F CFA" />
                 </div>
               </div>
               <Button className="w-full bg-primary gap-2" onClick={() => handleSave("Recettes")}>
@@ -182,7 +182,7 @@ export default function AdminDataPage() {
                   </Select>
                 </div>
                 <div className="space-y-2">
-                  <Label>Montant Total Actualisé (€)</Label>
+                  <Label>Montant Total Actualisé (F CFA)</Label>
                   <Input type="number" placeholder="Montant total de la dette" />
                 </div>
                 <div className="space-y-2">
@@ -247,8 +247,8 @@ export default function AdminDataPage() {
                   <Input type="month" />
                 </div>
                 <div className="space-y-2">
-                  <Label>Montant Dû par l'Assurance (€)</Label>
-                  <Input type="number" placeholder="0.00 €" />
+                  <Label>Montant Dû par l'Assurance (F CFA)</Label>
+                  <Input type="number" placeholder="0 F CFA" />
                 </div>
                 <Button className="w-full bg-green-600 hover:bg-green-700" onClick={() => handleSave("Montants Assurances")}>
                   Mettre à Jour la Créance

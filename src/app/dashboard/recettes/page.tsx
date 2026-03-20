@@ -3,13 +3,6 @@
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { 
-  Select, 
-  SelectContent, 
-  SelectItem, 
-  SelectTrigger, 
-  SelectValue 
-} from "@/components/ui/select";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { 
   AreaChart, 
@@ -53,7 +46,7 @@ export default function RecettesPage() {
             <CardTitle className="text-sm font-medium opacity-80">Total Période</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold">{totalRecettes.toLocaleString()} €</div>
+            <div className="text-3xl font-bold">{totalRecettes.toLocaleString()} F CFA</div>
           </CardContent>
         </Card>
         <Card className="border-none shadow-md">
@@ -61,7 +54,7 @@ export default function RecettesPage() {
             <CardTitle className="text-sm font-medium text-muted-foreground">Part Assurée (Moyenne)</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{(totalRecettes * 0.45).toLocaleString()} €</div>
+            <div className="text-2xl font-bold">{(totalRecettes * 0.45).toLocaleString()} F CFA</div>
           </CardContent>
         </Card>
         <Card className="border-none shadow-md">
@@ -69,7 +62,7 @@ export default function RecettesPage() {
             <CardTitle className="text-sm font-medium text-muted-foreground">Encaissements Comptants</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{(totalRecettes * 0.35).toLocaleString()} €</div>
+            <div className="text-2xl font-bold">{(totalRecettes * 0.35).toLocaleString()} F CFA</div>
           </CardContent>
         </Card>
         <Card className="border-none shadow-md">
@@ -77,7 +70,7 @@ export default function RecettesPage() {
             <CardTitle className="text-sm font-medium text-muted-foreground">Crédits en Cours</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{(totalRecettes * 0.15).toLocaleString()} €</div>
+            <div className="text-2xl font-bold">{(totalRecettes * 0.15).toLocaleString()} F CFA</div>
           </CardContent>
         </Card>
       </div>
@@ -100,7 +93,7 @@ export default function RecettesPage() {
                 <CartesianGrid strokeDasharray="3 3" vertical={false} />
                 <XAxis dataKey="period" />
                 <YAxis />
-                <Tooltip />
+                <Tooltip formatter={(value) => [`${value.toLocaleString()} F CFA`]} />
                 <Legend />
                 <Area 
                   type="monotone" 
@@ -165,28 +158,28 @@ export default function RecettesPage() {
               {RECETTES_DATA.map((row) => (
                 <TableRow key={row.period} className="hover:bg-muted/30">
                   <TableCell className="font-medium">{row.period}</TableCell>
-                  <TableCell className="text-right">{row.brute.toLocaleString()} €</TableCell>
+                  <TableCell className="text-right">{row.brute.toLocaleString()} F CFA</TableCell>
                   <TableCell className="text-right text-muted-foreground text-xs">{(row.brute/totalRecettes * 100).toFixed(1)}%</TableCell>
-                  <TableCell className="text-right">{row.tierPayant.toLocaleString()} €</TableCell>
+                  <TableCell className="text-right">{row.tierPayant.toLocaleString()} F CFA</TableCell>
                   <TableCell className="text-right text-muted-foreground text-xs">{(row.tierPayant/totalRecettes * 100).toFixed(1)}%</TableCell>
-                  <TableCell className="text-right">{row.credit.toLocaleString()} €</TableCell>
+                  <TableCell className="text-right">{row.credit.toLocaleString()} F CFA</TableCell>
                   <TableCell className="text-right text-muted-foreground text-xs">{(row.credit/totalRecettes * 100).toFixed(1)}%</TableCell>
-                  <TableCell className="text-right">{row.remises.toLocaleString()} €</TableCell>
+                  <TableCell className="text-right">{row.remises.toLocaleString()} F CFA</TableCell>
                   <TableCell className="text-right text-muted-foreground text-xs">{(row.remises/totalRecettes * 100).toFixed(1)}%</TableCell>
-                  <TableCell className="text-right font-bold text-primary">{(row.brute + row.tierPayant + row.credit).toLocaleString()} €</TableCell>
+                  <TableCell className="text-right font-bold text-primary">{(row.brute + row.tierPayant + row.credit).toLocaleString()} F CFA</TableCell>
                 </TableRow>
               ))}
               <TableRow className="bg-primary/5 font-bold">
                 <TableCell>TOTAL GÉNÉRAL</TableCell>
-                <TableCell className="text-right">{totalRecettes.toLocaleString()} €</TableCell>
+                <TableCell className="text-right">{totalRecettes.toLocaleString()} F CFA</TableCell>
                 <TableCell className="text-right"></TableCell>
-                <TableCell className="text-right">{RECETTES_DATA.reduce((a,b)=>a+b.tierPayant, 0).toLocaleString()} €</TableCell>
+                <TableCell className="text-right">{RECETTES_DATA.reduce((a,b)=>a+b.tierPayant, 0).toLocaleString()} F CFA</TableCell>
                 <TableCell className="text-right"></TableCell>
-                <TableCell className="text-right">{RECETTES_DATA.reduce((a,b)=>a+b.credit, 0).toLocaleString()} €</TableCell>
+                <TableCell className="text-right">{RECETTES_DATA.reduce((a,b)=>a+b.credit, 0).toLocaleString()} F CFA</TableCell>
                 <TableCell className="text-right"></TableCell>
-                <TableCell className="text-right">{RECETTES_DATA.reduce((a,b)=>a+b.remises, 0).toLocaleString()} €</TableCell>
+                <TableCell className="text-right">{RECETTES_DATA.reduce((a,b)=>a+b.remises, 0).toLocaleString()} F CFA</TableCell>
                 <TableCell className="text-right"></TableCell>
-                <TableCell className="text-right text-primary text-lg">{(totalRecettes + RECETTES_DATA.reduce((a,b)=>a+b.tierPayant, 0) + RECETTES_DATA.reduce((a,b)=>a+b.credit, 0)).toLocaleString()} €</TableCell>
+                <TableCell className="text-right text-primary text-lg">{(totalRecettes + RECETTES_DATA.reduce((a,b)=>a+b.tierPayant, 0) + RECETTES_DATA.reduce((a,b)=>a+b.credit, 0)).toLocaleString()} F CFA</TableCell>
               </TableRow>
             </TableBody>
           </Table>

@@ -9,7 +9,6 @@ import { Plus, Shield, AlertTriangle, Search } from "lucide-react";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 import { ASSURANCES_DATA } from "@/lib/mock-data";
 import { Badge } from "@/components/ui/badge";
-import { Input } from "@/components/ui/input";
 
 const REJETS_DATA = [
   { insurance: "Assurance Allianz", montant: 150, raison: "Tiers rejeté", date: "15/01/2026", periode: "Janvier" },
@@ -57,7 +56,7 @@ export default function AssurancesPage() {
                   <Badge variant="outline">Actif</Badge>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold text-primary">{a.consumed.toLocaleString()} €</div>
+                  <div className="text-2xl font-bold text-primary">{a.consumed.toLocaleString()} F CFA</div>
                   <p className="text-sm text-muted-foreground mt-1">Consommation cumulée (Q1 2026)</p>
                 </CardContent>
               </Card>
@@ -81,7 +80,7 @@ export default function AssurancesPage() {
                         <CartesianGrid strokeDasharray="3 3" vertical={false} />
                         <XAxis dataKey="name" />
                         <YAxis />
-                        <Tooltip />
+                        <Tooltip formatter={(value) => [`${value.toLocaleString()} F CFA`]} />
                         <Line type="monotone" dataKey="val" name="Montant Consommé" stroke="hsl(var(--primary))" strokeWidth={3} />
                       </LineChart>
                     </ResponsiveContainer>
@@ -123,13 +122,13 @@ export default function AssurancesPage() {
                 <TableBody>
                   <TableRow>
                     <TableCell className="font-medium">Janvier</TableCell>
-                    <TableCell className="text-right">4 200 €</TableCell>
+                    <TableCell className="text-right">4 200 F CFA</TableCell>
                     <TableCell className="text-right">45</TableCell>
                     <TableCell className="text-right">-</TableCell>
                   </TableRow>
                   <TableRow>
                     <TableCell className="font-medium">Février</TableCell>
-                    <TableCell className="text-right">3 850 €</TableCell>
+                    <TableCell className="text-right">3 850 F CFA</TableCell>
                     <TableCell className="text-right">42</TableCell>
                     <TableCell className="text-right text-red-500">↓ -8%</TableCell>
                   </TableRow>
@@ -146,7 +145,7 @@ export default function AssurancesPage() {
               <CardDescription className="text-red-700">Toutes assurances confondues pour la période en cours.</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold text-red-900">425 €</div>
+              <div className="text-3xl font-bold text-red-900">425 F CFA</div>
             </CardContent>
           </Card>
 
@@ -165,7 +164,7 @@ export default function AssurancesPage() {
                 {REJETS_DATA.map((row, i) => (
                   <TableRow key={i}>
                     <TableCell className="font-medium">{row.insurance}</TableCell>
-                    <TableCell className="font-bold text-red-600">{row.montant} €</TableCell>
+                    <TableCell className="font-bold text-red-600">{row.montant.toLocaleString()} F CFA</TableCell>
                     <TableCell>{row.raison}</TableCell>
                     <TableCell>{row.date}</TableCell>
                     <TableCell>{row.periode}</TableCell>

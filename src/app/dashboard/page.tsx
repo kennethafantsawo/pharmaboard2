@@ -36,7 +36,7 @@ export default function DashboardOverview() {
             <Coins className="h-4 w-4 text-primary" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{KPI_OVERVIEW.entreesMois.toLocaleString()} €</div>
+            <div className="text-2xl font-bold">{KPI_OVERVIEW.entreesMois.toLocaleString()} F CFA</div>
             <div className="flex items-center text-xs text-green-600 mt-1 font-medium">
               <TrendingUp className="h-3 w-3 mr-1" />
               +12% vs mois dernier
@@ -51,7 +51,7 @@ export default function DashboardOverview() {
             <Package className="h-4 w-4 text-orange-400" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{KPI_OVERVIEW.sortiesMois.toLocaleString()} €</div>
+            <div className="text-2xl font-bold">{KPI_OVERVIEW.sortiesMois.toLocaleString()} F CFA</div>
             <div className="flex items-center text-xs text-green-600 mt-1 font-medium">
               <TrendingDown className="h-3 w-3 mr-1" />
               -8% vs mois dernier
@@ -66,7 +66,7 @@ export default function DashboardOverview() {
             <ArrowUpRight className="h-4 w-4 text-secondary" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{(KPI_OVERVIEW.entreesMois - KPI_OVERVIEW.sortiesMois).toLocaleString()} €</div>
+            <div className="text-2xl font-bold">{(KPI_OVERVIEW.entreesMois - KPI_OVERVIEW.sortiesMois).toLocaleString()} F CFA</div>
             <div className="flex items-center text-xs text-green-600 mt-1 font-medium">
               <TrendingUp className="h-3 w-3 mr-1" />
               +15% vs mois dernier
@@ -81,7 +81,7 @@ export default function DashboardOverview() {
             <Info className="h-4 w-4 text-red-400" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">3 200 €</div>
+            <div className="text-2xl font-bold">3 200 F CFA</div>
             <div className="flex items-center text-xs text-red-600 mt-1 font-medium">
               <TrendingDown className="h-3 w-3 mr-1" />
               +5% d'anomalies
@@ -104,6 +104,7 @@ export default function DashboardOverview() {
                   <XAxis dataKey="period" />
                   <YAxis />
                   <Tooltip 
+                    formatter={(value) => [`${value.toLocaleString()} F CFA`]}
                     contentStyle={{ backgroundColor: '#fff', borderRadius: '8px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}
                   />
                   <Legend />

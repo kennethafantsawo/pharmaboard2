@@ -26,7 +26,7 @@ export default function ImplantsPage() {
                 <CartesianGrid strokeDasharray="3 3" vertical={false} />
                 <XAxis dataKey="mois" />
                 <YAxis />
-                <Tooltip />
+                <Tooltip formatter={(value) => [`${value.toLocaleString()} F CFA`]} />
                 <Legend />
                 <Line type="monotone" dataKey="f1" name="Fournisseur A" stroke="hsl(var(--primary))" strokeWidth={2} />
                 <Line type="monotone" dataKey="f2" name="Fournisseur B" stroke="hsl(var(--secondary))" strokeWidth={2} />
@@ -50,9 +50,9 @@ export default function ImplantsPage() {
             {IMPLANTS_DATA.map((row) => (
               <TableRow key={row.mois}>
                 <TableCell className="font-medium">{row.mois}</TableCell>
-                <TableCell className="text-right">{row.f1.toLocaleString()} €</TableCell>
-                <TableCell className="text-right">{row.f2.toLocaleString()} €</TableCell>
-                <TableCell className="text-right font-bold text-primary">{row.total.toLocaleString()} €</TableCell>
+                <TableCell className="text-right">{row.f1.toLocaleString()} F CFA</TableCell>
+                <TableCell className="text-right">{row.f2.toLocaleString()} F CFA</TableCell>
+                <TableCell className="text-right font-bold text-primary">{row.total.toLocaleString()} F CFA</TableCell>
               </TableRow>
             ))}
           </TableBody>

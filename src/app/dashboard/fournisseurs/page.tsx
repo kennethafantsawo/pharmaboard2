@@ -52,7 +52,7 @@ export default function FournisseursPage() {
                     <CartesianGrid strokeDasharray="3 3" vertical={false} />
                     <XAxis dataKey="fournisseur" />
                     <YAxis />
-                    <Tooltip />
+                    <Tooltip formatter={(value) => [`${value.toLocaleString()} F CFA`]} />
                     <Legend />
                     <Bar dataKey="jan" name="Janvier" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} />
                     <Bar dataKey="feb" name="Février" fill="hsl(var(--secondary))" radius={[4, 4, 0, 0]} />
@@ -78,10 +78,10 @@ export default function FournisseursPage() {
                 {COMMANDES_DATA.map((row) => (
                   <TableRow key={row.fournisseur}>
                     <TableCell className="font-medium">{row.fournisseur}</TableCell>
-                    <TableCell className="text-right">{row.jan.toLocaleString()} €</TableCell>
-                    <TableCell className="text-right">{row.feb.toLocaleString()} €</TableCell>
-                    <TableCell className="text-right">{row.mar.toLocaleString()} €</TableCell>
-                    <TableCell className="text-right font-bold">{row.total.toLocaleString()} €</TableCell>
+                    <TableCell className="text-right">{row.jan.toLocaleString()} F CFA</TableCell>
+                    <TableCell className="text-right">{row.feb.toLocaleString()} F CFA</TableCell>
+                    <TableCell className="text-right">{row.mar.toLocaleString()} F CFA</TableCell>
+                    <TableCell className="text-right font-bold">{row.total.toLocaleString()} F CFA</TableCell>
                   </TableRow>
                 ))}
               </TableBody>
@@ -96,7 +96,7 @@ export default function FournisseursPage() {
                 <CardTitle className="text-sm font-medium text-green-700">Total Payé</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold text-green-800">3 700 €</div>
+                <div className="text-2xl font-bold text-green-800">3 700 F CFA</div>
               </CardContent>
             </Card>
             <Card className="border-none shadow-md bg-orange-50">
@@ -104,7 +104,7 @@ export default function FournisseursPage() {
                 <CardTitle className="text-sm font-medium text-orange-700">Total Dû</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold text-orange-800">1 750 €</div>
+                <div className="text-2xl font-bold text-orange-800">1 750 F CFA</div>
               </CardContent>
             </Card>
           </div>
@@ -125,7 +125,7 @@ export default function FournisseursPage() {
                   <TableRow key={row.id}>
                     <TableCell className="font-medium">{row.fournisseur}</TableCell>
                     <TableCell>{row.date}</TableCell>
-                    <TableCell className="text-right font-semibold">{row.montant.toLocaleString()} €</TableCell>
+                    <TableCell className="text-right font-semibold">{row.montant.toLocaleString()} F CFA</TableCell>
                     <TableCell>
                       {row.statut === "Payée" ? (
                         <Badge variant="secondary" className="bg-green-100 text-green-700 hover:bg-green-100 gap-1 border-none">
@@ -167,7 +167,7 @@ export default function FournisseursPage() {
                 <TableRow>
                   <TableCell className="font-medium">Grossiste Pharma A</TableCell>
                   <TableCell>Janvier</TableCell>
-                  <TableCell className="text-right font-semibold">150 €</TableCell>
+                  <TableCell className="text-right font-semibold">150 F CFA</TableCell>
                   <TableCell>Produits défectueux</TableCell>
                   <TableCell>
                     <Badge variant="secondary" className="bg-green-100 text-green-700 border-none">Remboursé</Badge>
@@ -176,7 +176,7 @@ export default function FournisseursPage() {
                 <TableRow>
                   <TableCell className="font-medium">BioCare Solutions</TableCell>
                   <TableCell>Janvier</TableCell>
-                  <TableCell className="text-right font-semibold">300 €</TableCell>
+                  <TableCell className="text-right font-semibold">300 F CFA</TableCell>
                   <TableCell>Commande erronée</TableCell>
                   <TableCell>
                     <Badge variant="secondary" className="bg-orange-100 text-orange-700 border-none">En attente</Badge>
