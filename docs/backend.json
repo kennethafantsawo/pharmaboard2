@@ -1,0 +1,56 @@
+{
+  "entities": {
+    "Fournisseur": {
+      "title": "Fournisseur",
+      "description": "Grossiste ou partenaire de la pharmacie",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "contact": { "type": "string" },
+        "email": { "type": "string", "format": "email" },
+        "address": { "type": "string" }
+      },
+      "required": ["name"]
+    },
+    "Recette": {
+      "title": "Recette",
+      "description": "Entrée journalière de fonds",
+      "type": "object",
+      "properties": {
+        "date": { "type": "string", "format": "date" },
+        "brute": { "type": "number" },
+        "tierPayant": { "type": "number" },
+        "credit": { "type": "number" },
+        "remises": { "type": "number" }
+      },
+      "required": ["date", "brute"]
+    },
+    "Assurance": {
+      "title": "Assurance",
+      "description": "Compagnie d'assurance partenaire",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "typeContrat": { "type": "string" }
+      },
+      "required": ["name"]
+    }
+  },
+  "auth": {
+    "providers": ["password"]
+  },
+  "firestore": {
+    "/fournisseurs/{fournisseurId}": {
+      "schema": "Fournisseur",
+      "description": "Liste des grossistes"
+    },
+    "/recettes/{recetteId}": {
+      "schema": "Recette",
+      "description": "Détails des recettes journalières"
+    },
+    "/assurances/{assuranceId}": {
+      "schema": "Assurance",
+      "description": "Compagnies d'assurances"
+    }
+  }
+}
