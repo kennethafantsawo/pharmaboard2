@@ -1,13 +1,23 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip } from 'recharts';
-import { DCSSA_DATA } from "@/lib/mock-data";
+import { getDcssa } from "@/lib/mock-data";
 
 export default function DcssaPage() {
-  const hasData = DCSSA_DATA.length > 0;
+  const [data, setData] = useState<any[]>([]);
+
+  useEffect(() => {
+    const load = () => setData(getDcssa());
+    load();
+    window.addEventListener('storage-update', load);
+    return () => window.removeEventListener('storage-update', load);
+  }, []);
+
+  const hasData = data.length > 0;
 
   return (
     <div className="space-y-6">
@@ -28,7 +38,7 @@ export default function DcssaPage() {
               <div className="h-[300px] flex items-center justify-center">
                 {hasData ? (
                   <ResponsiveContainer width="100%" height="100%">
-                    <BarChart data={DCSSA_DATA}>
+                    <BarChart data={data}>
                       <CartesianGrid strokeDasharray="3 3" vertical={false} />
                       <XAxis dataKey="mois" />
                       <YAxis />
@@ -55,12 +65,12 @@ export default function DcssaPage() {
               </TableHeader>
               <TableBody>
                 {hasData ? (
-                  DCSSA_DATA.map((row) => (
-                    <TableRow key={row.mois}>
+                  data.map((row, i) => (
+                    <TableRow key={i}>
                       <TableCell className="font-medium">{row.mois}</TableCell>
-                      <TableCell className="text-right">{row.montant.toLocaleString()} F CFA</TableCell>
+                      <TableCell className="text-right">{Number(row.montant).toLocaleString()} F CFA</TableCell>
                       <TableCell className="text-right">{row.dossiers}</TableCell>
-                      <TableCell className="text-right font-bold text-primary">{row.solde.toLocaleString()} F CFA</TableCell>
+                      <TableCell className="text-right font-bold text-primary">{Number(row.solde).toLocaleString()} F CFA</TableCell>
                     </TableRow>
                   ))
                 ) : (

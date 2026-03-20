@@ -1,4 +1,3 @@
-
 "use client";
 
 // Utilitaire pour gérer la persistance locale simple pour le prototype
@@ -32,13 +31,13 @@ export const addRecette = (data: any) => {
 export const getFournisseurs = () => getStorage('pharma_fournisseurs', []);
 export const addFournisseur = (data: any) => {
   const current = getFournisseurs();
-  setStorage('pharma_fournisseurs', [...current, { ...data, id: Date.now().toString(), consumed: 0 }]);
+  setStorage('pharma_fournisseurs', [...current, { ...data, id: Date.now().toString() }]);
 };
 
 export const getAssurances = () => getStorage('pharma_assurances', []);
 export const addAssurance = (data: any) => {
   const current = getAssurances();
-  setStorage('pharma_assurances', [...current, { ...data, id: Date.now().toString(), consumed: 0 }]);
+  setStorage('pharma_assurances', [...current, { ...data, id: Date.now().toString() }]);
 };
 
 export const getFactures = () => getStorage('pharma_factures', []);
