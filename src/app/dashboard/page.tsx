@@ -1,7 +1,7 @@
 "use client";
 
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { TrendingUp, TrendingDown, ArrowUpRight, Coins, Package, Info, Calendar } from "lucide-react";
+import { TrendingUp, TrendingDown, ArrowUpRight, Coins, Package, Info } from "lucide-react";
 import { 
   XAxis, 
   YAxis, 
@@ -90,14 +90,14 @@ export default function DashboardOverview() {
         </Card>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <Card className="lg:col-span-2 border-none shadow-md">
+      <div className="grid grid-cols-1 gap-6">
+        <Card className="border-none shadow-md">
           <CardHeader>
             <CardTitle>Evolution Entrées vs Sorties</CardTitle>
             <CardDescription>Comparaison journalière sur les 7 derniers jours</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="h-[350px]">
+            <div className="h-[400px]">
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart data={RECETTES_DATA}>
                   <CartesianGrid strokeDasharray="3 3" vertical={false} />
@@ -111,29 +111,6 @@ export default function DashboardOverview() {
                   <Line type="monotone" dataKey="tierPayant" name="Commandes" stroke="hsl(var(--secondary))" strokeWidth={3} dot={{ r: 4 }} />
                 </LineChart>
               </ResponsiveContainer>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="border-none shadow-md">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Calendar className="w-5 h-5 text-primary" />
-              Événements à venir
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="p-3 bg-muted/30 rounded-lg border-l-4 border-primary">
-              <p className="text-sm font-bold">Inventaire Mensuel</p>
-              <p className="text-xs text-muted-foreground">Demain, 08:00 - Zone Stock A</p>
-            </div>
-            <div className="p-3 bg-muted/30 rounded-lg border-l-4 border-secondary">
-              <p className="text-sm font-bold">Réunion Fournisseurs</p>
-              <p className="text-xs text-muted-foreground">Vendredi, 10:30 - Bureau</p>
-            </div>
-            <div className="p-3 bg-muted/30 rounded-lg border-l-4 border-orange-400">
-              <p className="text-sm font-bold">Vérification des Périmés</p>
-              <p className="text-xs text-muted-foreground">25 Janvier - Équipe Assistante</p>
             </div>
           </CardContent>
         </Card>
