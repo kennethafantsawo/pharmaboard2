@@ -1,6 +1,7 @@
+
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -15,12 +16,23 @@ import {
 import { Lock, FileUp, Save, History, Database, PlusCircle, CreditCard, Building2, ShieldCheck } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { FOURNISSEURS_DATA, ASSURANCES_DATA } from "@/lib/mock-data";
+import { addRecette, addFournisseur, addAssurance, addFacture, updateCreanceAssurance, getFournisseurs, getAssurances } from "@/lib/mock-data";
 
 export default function AdminDataPage() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [adminPass, setAdminPass] = useState("");
   const { toast } = useToast();
+  
+  // States pour les listes (fournisseurs et assurances enregistrés)
+  const [fournisseurs, setFournisseurs] = useState<any[]>([]);
+  const [assurances, setAssurances] = useState<any[]>([]);
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      setFournisseurs(getFournisseurs());
+      setAssurances(getAssurances());
+    }
+  }, [isAuthenticated]);
 
   const handleAuth = (e: React.FormEvent) => {
     e.preventDefault();
@@ -32,11 +44,50 @@ export default function AdminDataPage() {
     }
   };
 
-  const handleSave = (category: string) => {
-    toast({
-      title: "Données enregistrées",
-      description: `Les modifications pour ${category} ont été prises en compte en F CFA.`,
-    });
+  // Gestion Recettes
+  const [recetteForm, setRecetteForm] = useState({ date: "", brute: "", tierPayant: "", credit: "", remises: "" });
+  const handleSaveRecette = () => {
+    if (!recetteForm.date || !recetteForm.brute) return toast({ variant: "destructive", title: "Erreur", description: "Date et Recette Brute obligatoires." });
+    addRecette(recetteForm);
+    toast({ title: "Succès", description: "Recette enregistrée." });
+    setRecetteForm({ date: "", brute: "", tierPayant: "", credit: "", remises: "" });
+  };
+
+  // Gestion Fournisseurs
+  const [fournForm, setFournForm] = useState({ name: "", contact: "", email: "" });
+  const handleCreateFournisseur = () => {
+    if (!fournForm.name) return;
+    addFournisseur(fournForm);
+    setFournisseurs(getFournisseurs());
+    toast({ title: "Succès", description: "Fournisseur créé." });
+    setFournForm({ name: "", contact: "", email: "" });
+  };
+
+  const [detteForm, setDetteForm] = useState({ fournisseurId: "", montant: "", facture: "" });
+  const handleSaveFacture = () => {
+    if (!detteForm.fournisseurId || !detteForm.montant) return;
+    const f = fournisseurs.find(x => x.id === detteForm.fournisseurId);
+    addFacture({ ...detteForm, fournisseur: f?.name, date: new Date().toLocaleDateString(), statut: "En attente" });
+    toast({ title: "Succès", description: "Facture/Dette enregistrée." });
+    setDetteForm({ fournisseurId: "", montant: "", facture: "" });
+  };
+
+  // Gestion Assurances
+  const [assuForm, setAssuForm] = useState({ name: "", typeContrat: "" });
+  const handleCreateAssurance = () => {
+    if (!assuForm.name) return;
+    addAssurance(assuForm);
+    setAssurances(getAssurances());
+    toast({ title: "Succès", description: "Assurance ajoutée." });
+    setAssuForm({ name: "", typeContrat: "" });
+  };
+
+  const [creanceForm, setCreanceForm] = useState({ assuranceId: "", mois: "", montant: "" });
+  const handleUpdateCreance = () => {
+    if (!creanceForm.assuranceId || !creanceForm.montant) return;
+    updateCreanceAssurance(creanceForm);
+    toast({ title: "Succès", description: "Créance assurance mise à jour." });
+    setCreanceForm({ assuranceId: "", mois: "", montant: "" });
   };
 
   if (!isAuthenticated) {
@@ -79,14 +130,6 @@ export default function AdminDataPage() {
           </h1>
           <p className="text-muted-foreground">Gestion des entrées journalières, fournisseurs et créances assurances.</p>
         </div>
-        <div className="flex gap-2">
-          <Button variant="outline" className="gap-2">
-            <FileUp className="w-4 h-4" /> Template Excel
-          </Button>
-          <Button variant="outline" className="gap-2">
-            <History className="w-4 h-4" /> Historique
-          </Button>
-        </div>
       </div>
 
       <Tabs defaultValue="recettes" className="w-full">
@@ -94,7 +137,6 @@ export default function AdminDataPage() {
           <TabsTrigger value="recettes">Recettes</TabsTrigger>
           <TabsTrigger value="fournisseurs">Fournisseurs</TabsTrigger>
           <TabsTrigger value="assurances">Assurances</TabsTrigger>
-          <TabsTrigger value="excel" className="text-primary font-bold">Import Excel</TabsTrigger>
         </TabsList>
 
         <TabsContent value="recettes">
@@ -107,26 +149,26 @@ export default function AdminDataPage() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-2">
                   <Label>Date de l'opération</Label>
-                  <Input type="date" />
+                  <Input type="date" value={recetteForm.date} onChange={(e) => setRecetteForm({...recetteForm, date: e.target.value})} />
                 </div>
                 <div className="space-y-2">
                   <Label>Recette Brute (Comptants)</Label>
-                  <Input type="number" placeholder="0 F CFA" />
+                  <Input type="number" placeholder="0 F CFA" value={recetteForm.brute} onChange={(e) => setRecetteForm({...recetteForm, brute: e.target.value})} />
                 </div>
                 <div className="space-y-2">
                   <Label>Tiers Payant (Part Assurée)</Label>
-                  <Input type="number" placeholder="0 F CFA" />
+                  <Input type="number" placeholder="0 F CFA" value={recetteForm.tierPayant} onChange={(e) => setRecetteForm({...recetteForm, tierPayant: e.target.value})} />
                 </div>
                 <div className="space-y-2">
                   <Label>Crédits Patients</Label>
-                  <Input type="number" placeholder="0 F CFA" />
+                  <Input type="number" placeholder="0 F CFA" value={recetteForm.credit} onChange={(e) => setRecetteForm({...recetteForm, credit: e.target.value})} />
                 </div>
                 <div className="space-y-2">
                   <Label>Remises Accordées</Label>
-                  <Input type="number" placeholder="0 F CFA" />
+                  <Input type="number" placeholder="0 F CFA" value={recetteForm.remises} onChange={(e) => setRecetteForm({...recetteForm, remises: e.target.value})} />
                 </div>
               </div>
-              <Button className="w-full bg-primary gap-2" onClick={() => handleSave("Recettes")}>
+              <Button className="w-full bg-primary gap-2" onClick={handleSaveRecette}>
                 <Save className="w-4 h-4" /> Enregistrer les Recettes
               </Button>
             </CardContent>
@@ -145,19 +187,13 @@ export default function AdminDataPage() {
               <CardContent className="space-y-4">
                 <div className="space-y-2">
                   <Label>Nom du Grossiste</Label>
-                  <Input placeholder="Ex: Labo Pharma" />
+                  <Input placeholder="Ex: Labo Pharma" value={fournForm.name} onChange={(e) => setFournForm({...fournForm, name: e.target.value})} />
                 </div>
                 <div className="space-y-2">
                   <Label>Contact / Téléphone</Label>
-                  <Input placeholder="+221 ..." />
+                  <Input placeholder="+221 ..." value={fournForm.contact} onChange={(e) => setFournForm({...fournForm, contact: e.target.value})} />
                 </div>
-                <div className="space-y-2">
-                  <Label>Email</Label>
-                  <Input type="email" placeholder="contact@labo.com" />
-                </div>
-                <Button className="w-full" onClick={() => handleSave("Nouveau Fournisseur")}>
-                  Créer le profil
-                </Button>
+                <Button className="w-full" onClick={handleCreateFournisseur}>Créer le profil</Button>
               </CardContent>
             </Card>
 
@@ -166,32 +202,28 @@ export default function AdminDataPage() {
                 <CardTitle className="flex items-center gap-2">
                   <CreditCard className="w-5 h-5 text-orange-600" /> Montants Dus (Dettes)
                 </CardTitle>
-                <CardDescription>Mettre à jour le solde dû à un fournisseur.</CardDescription>
+                <CardDescription>Enregistrer une nouvelle facture fournisseur.</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="space-y-2">
                   <Label>Sélectionner le Fournisseur</Label>
-                  <Select>
+                  <Select onValueChange={(v) => setDetteForm({...detteForm, fournisseurId: v})}>
                     <SelectTrigger>
                       <SelectValue placeholder="Choisir..." />
                     </SelectTrigger>
                     <SelectContent>
-                      {FOURNISSEURS_DATA.map(f => (
+                      {fournisseurs.map(f => (
                         <SelectItem key={f.id} value={f.id}>{f.name}</SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
                 </div>
                 <div className="space-y-2">
-                  <Label>Montant Total Actualisé (F CFA)</Label>
-                  <Input type="number" placeholder="Montant en F CFA" />
+                  <Label>Montant Facture (F CFA)</Label>
+                  <Input type="number" placeholder="Montant en F CFA" value={detteForm.montant} onChange={(e) => setDetteForm({...detteForm, montant: e.target.value})} />
                 </div>
-                <div className="space-y-2">
-                  <Label>N° de la dernière Facture</Label>
-                  <Input placeholder="Référence facture" />
-                </div>
-                <Button className="w-full bg-orange-600 hover:bg-orange-700" onClick={() => handleSave("Dettes Fournisseurs")}>
-                  Actualiser le Solde
+                <Button className="w-full bg-orange-600 hover:bg-orange-700" onClick={handleSaveFacture}>
+                  Enregistrer la Facture
                 </Button>
               </CardContent>
             </Card>
@@ -210,15 +242,13 @@ export default function AdminDataPage() {
               <CardContent className="space-y-4">
                 <div className="space-y-2">
                   <Label>Nom de l'Assurance</Label>
-                  <Input placeholder="Ex: AXA, Allianz..." />
+                  <Input placeholder="Ex: AXA, Allianz..." value={assuForm.name} onChange={(e) => setAssuForm({...assuForm, name: e.target.value})} />
                 </div>
                 <div className="space-y-2">
                   <Label>Type de contrat</Label>
-                  <Input placeholder="Tiers-payant / Remboursement" />
+                  <Input placeholder="Tiers-payant" value={assuForm.typeContrat} onChange={(e) => setAssuForm({...assuForm, typeContrat: e.target.value})} />
                 </div>
-                <Button className="w-full" onClick={() => handleSave("Nouvelle Assurance")}>
-                  Enregistrer l'Assurance
-                </Button>
+                <Button className="w-full" onClick={handleCreateAssurance}>Enregistrer l'Assurance</Button>
               </CardContent>
             </Card>
 
@@ -227,54 +257,32 @@ export default function AdminDataPage() {
                 <CardTitle className="flex items-center gap-2">
                   <ShieldCheck className="w-5 h-5 text-green-600" /> Créances (Montants à recevoir)
                 </CardTitle>
-                <CardDescription>Mettre à jour ce que l'assurance doit à la pharmacie.</CardDescription>
+                <CardDescription>Mettre à jour ce que l'assurance doit.</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="space-y-2">
                   <Label>Sélectionner l'Assurance</Label>
-                  <Select>
+                  <Select onValueChange={(v) => setCreanceForm({...creanceForm, assuranceId: v})}>
                     <SelectTrigger>
                       <SelectValue placeholder="Choisir..." />
                     </SelectTrigger>
                     <SelectContent>
-                      {ASSURANCES_DATA.map(a => (
+                      {assurances.map(a => (
                         <SelectItem key={a.id} value={a.id}>{a.name}</SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
                 </div>
                 <div className="space-y-2">
-                  <Label>Mois Concerné</Label>
-                  <Input type="month" />
+                  <Label>Montant à Recevoir (F CFA)</Label>
+                  <Input type="number" placeholder="Montant en F CFA" value={creanceForm.montant} onChange={(e) => setCreanceForm({...creanceForm, montant: e.target.value})} />
                 </div>
-                <div className="space-y-2">
-                  <Label>Montant Total à Percevoir (F CFA)</Label>
-                  <Input type="number" placeholder="Montant en F CFA" />
-                </div>
-                <Button className="w-full bg-green-600 hover:bg-green-700" onClick={() => handleSave("Montants Assurances")}>
+                <Button className="w-full bg-green-600 hover:bg-green-700" onClick={handleUpdateCreance}>
                   Mettre à Jour la Créance
                 </Button>
               </CardContent>
             </Card>
           </div>
-        </TabsContent>
-
-        <TabsContent value="excel">
-          <Card className="border-none shadow-md border-2 border-dashed border-primary/20">
-            <CardContent className="flex flex-col items-center justify-center py-20">
-              <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mb-4">
-                <FileUp className="text-primary w-8 h-8" />
-              </div>
-              <h3 className="text-xl font-bold mb-2">Importation Groupée</h3>
-              <p className="text-muted-foreground text-center max-w-sm mb-6">
-                Importez vos données mensuelles via notre template Excel. Tous les calculs seront automatisés.
-              </p>
-              <Input type="file" className="hidden" id="excel-upload" accept=".xlsx,.xls" />
-              <Label htmlFor="excel-upload" className="cursor-pointer bg-primary text-white px-6 py-3 rounded-lg hover:bg-primary/90 transition-colors inline-flex items-center gap-2">
-                Sélectionner le fichier Excel
-              </Label>
-            </CardContent>
-          </Card>
         </TabsContent>
       </Tabs>
     </div>

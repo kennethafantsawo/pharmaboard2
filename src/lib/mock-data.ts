@@ -1,22 +1,64 @@
-export const RECETTES_DATA: any[] = [];
 
-export const FOURNISSEURS_DATA: any[] = [];
+"use client";
 
-export const COMMANDES_DATA: any[] = [];
+// Utilitaire pour gérer la persistance locale simple pour le prototype
+const isClient = typeof window !== 'undefined';
 
-export const FACTURES_DATA: any[] = [];
+const getStorage = (key: string, defaultValue: any) => {
+  if (!isClient) return defaultValue;
+  const saved = localStorage.getItem(key);
+  return saved ? JSON.parse(saved) : defaultValue;
+};
 
-export const ASSURANCES_DATA: any[] = [];
+const setStorage = (key: string, data: any) => {
+  if (isClient) {
+    localStorage.setItem(key, JSON.stringify(data));
+    // Déclencher un événement personnalisé pour informer les autres composants
+    window.dispatchEvent(new Event('storage-update'));
+  }
+};
 
-export const REJETS_DATA: any[] = [];
+export const getRecettes = () => getStorage('pharma_recettes', []);
+export const addRecette = (data: any) => {
+  const current = getRecettes();
+  setStorage('pharma_recettes', [...current, data]);
+};
 
-export const DCSSA_DATA: any[] = [];
+export const getFournisseurs = () => getStorage('pharma_fournisseurs', []);
+export const addFournisseur = (data: any) => {
+  const current = getFournisseurs();
+  setStorage('pharma_fournisseurs', [...current, { ...data, id: Date.now().toString() }]);
+};
 
-export const IMPLANTS_DATA: any[] = [];
+export const getAssurances = () => getStorage('pharma_assurances', []);
+export const addAssurance = (data: any) => {
+  const current = getAssurances();
+  setStorage('pharma_assurances', [...current, { ...data, id: Date.now().toString(), consumed: 0 }]);
+};
 
-export const KPI_OVERVIEW = {
-  entreesJour: 0,
-  entreesMois: 0,
-  sortiesJour: 0,
-  sortiesMois: 0,
+export const getFactures = () => getStorage('pharma_factures', []);
+export const addFacture = (data: any) => {
+  const current = getFactures();
+  setStorage('pharma_factures', [...current, { ...data, id: Date.now().toString() }]);
+};
+
+export const getCreancesAssurance = () => getStorage('pharma_creances_assurance', []);
+export const updateCreanceAssurance = (data: any) => {
+  const current = getCreancesAssurance();
+  setStorage('pharma_creances_assurance', [...current, data]);
+};
+
+export const getKPIs = () => {
+  const recettes = getRecettes();
+  const factures = getFactures();
+  
+  const totalRecettes = recettes.reduce((acc: number, r: any) => acc + (Number(r.brute) || 0), 0);
+  const totalCommandes = factures.reduce((acc: number, f: any) => acc + (Number(f.montant) || 0), 0);
+  
+  return {
+    entreesMois: totalRecettes,
+    sortiesMois: totalCommandes,
+    marge: totalRecettes - totalCommandes,
+    rejets: 0
+  };
 };
