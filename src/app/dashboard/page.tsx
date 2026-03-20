@@ -94,7 +94,7 @@ export default function DashboardOverview() {
         <Card className="border-none shadow-md">
           <CardHeader>
             <CardTitle>Evolution Entrées vs Sorties</CardTitle>
-            <CardDescription>Comparaison journalière sur les 7 derniers jours</CardDescription>
+            <CardDescription>Comparaison journalière sur les 7 derniers jours (F CFA)</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="h-[450px]">

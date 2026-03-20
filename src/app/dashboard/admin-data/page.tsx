@@ -35,7 +35,7 @@ export default function AdminDataPage() {
   const handleSave = (category: string) => {
     toast({
       title: "Données enregistrées",
-      description: `Les modifications pour ${category} ont été prises en compte.`,
+      description: `Les modifications pour ${category} ont été prises en compte en F CFA.`,
     });
   };
 
@@ -48,7 +48,7 @@ export default function AdminDataPage() {
               <Lock className="text-orange-600" />
             </div>
             <CardTitle>Protection Supplémentaire</CardTitle>
-            <CardDescription>Veuillez entrer le mot de passe administrateur pour accéder à la mise à jour des données.</CardDescription>
+            <CardDescription>Entrez le mot de passe administrateur pour mettre à jour les données.</CardDescription>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleAuth} className="space-y-4">
@@ -77,20 +77,20 @@ export default function AdminDataPage() {
           <h1 className="text-3xl font-headline font-bold flex items-center gap-2">
             <Database className="text-orange-600" /> Mise à Jour des Données
           </h1>
-          <p className="text-muted-foreground">Ajoutez ou modifiez les entrées journalières, les fournisseurs et les assurances.</p>
+          <p className="text-muted-foreground">Gestion des entrées journalières, fournisseurs et créances assurances.</p>
         </div>
         <div className="flex gap-2">
           <Button variant="outline" className="gap-2">
-            <FileUp className="w-4 h-4" /> Télécharger Template
+            <FileUp className="w-4 h-4" /> Template Excel
           </Button>
           <Button variant="outline" className="gap-2">
-            <History className="w-4 h-4" /> Logs
+            <History className="w-4 h-4" /> Historique
           </Button>
         </div>
       </div>
 
       <Tabs defaultValue="recettes" className="w-full">
-        <TabsList className="bg-white border border-border p-1 h-12 shadow-sm rounded-xl mb-6 flex overflow-x-auto whitespace-nowrap">
+        <TabsList className="bg-white border border-border p-1 h-12 shadow-sm rounded-xl mb-6 flex overflow-x-auto">
           <TabsTrigger value="recettes">Recettes</TabsTrigger>
           <TabsTrigger value="fournisseurs">Fournisseurs</TabsTrigger>
           <TabsTrigger value="assurances">Assurances</TabsTrigger>
@@ -101,6 +101,7 @@ export default function AdminDataPage() {
           <Card className="border-none shadow-md">
             <CardHeader>
               <CardTitle>Saisie Manuelle - Recettes</CardTitle>
+              <CardDescription>Tous les montants doivent être saisis en F CFA.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -113,11 +114,7 @@ export default function AdminDataPage() {
                   <Input type="number" placeholder="0 F CFA" />
                 </div>
                 <div className="space-y-2">
-                  <Label>Part Assurée (Recette)</Label>
-                  <Input type="number" placeholder="0 F CFA" />
-                </div>
-                <div className="space-y-2">
-                  <Label>Tiers Payant</Label>
+                  <Label>Tiers Payant (Part Assurée)</Label>
                   <Input type="number" placeholder="0 F CFA" />
                 </div>
                 <div className="space-y-2">
@@ -125,7 +122,7 @@ export default function AdminDataPage() {
                   <Input type="number" placeholder="0 F CFA" />
                 </div>
                 <div className="space-y-2">
-                  <Label>Remises Autorisées</Label>
+                  <Label>Remises Accordées</Label>
                   <Input type="number" placeholder="0 F CFA" />
                 </div>
               </div>
@@ -143,19 +140,23 @@ export default function AdminDataPage() {
                 <CardTitle className="flex items-center gap-2">
                   <PlusCircle className="w-5 h-5 text-primary" /> Nouveau Fournisseur
                 </CardTitle>
-                <CardDescription>Ajouter une nouvelle entité à la base de données.</CardDescription>
+                <CardDescription>Ajouter un nouveau grossiste partenaire.</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="space-y-2">
-                  <Label>Nom du Fournisseur / Grossiste</Label>
-                  <Input placeholder="Ex: Grossiste Pharma X" />
+                  <Label>Nom du Grossiste</Label>
+                  <Input placeholder="Ex: Labo Pharma" />
                 </div>
                 <div className="space-y-2">
-                  <Label>Contact (Téléphone/Email)</Label>
-                  <Input placeholder="Contact principal" />
+                  <Label>Contact / Téléphone</Label>
+                  <Input placeholder="+221 ..." />
+                </div>
+                <div className="space-y-2">
+                  <Label>Email</Label>
+                  <Input type="email" placeholder="contact@labo.com" />
                 </div>
                 <Button className="w-full" onClick={() => handleSave("Nouveau Fournisseur")}>
-                  Créer le Fournisseur
+                  Créer le profil
                 </Button>
               </CardContent>
             </Card>
@@ -165,14 +166,14 @@ export default function AdminDataPage() {
                 <CardTitle className="flex items-center gap-2">
                   <CreditCard className="w-5 h-5 text-orange-600" /> Montants Dus (Dettes)
                 </CardTitle>
-                <CardDescription>Mettre à jour le montant total dû à un fournisseur.</CardDescription>
+                <CardDescription>Mettre à jour le solde dû à un fournisseur.</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="space-y-2">
                   <Label>Sélectionner le Fournisseur</Label>
                   <Select>
                     <SelectTrigger>
-                      <SelectValue placeholder="Choisir un fournisseur" />
+                      <SelectValue placeholder="Choisir..." />
                     </SelectTrigger>
                     <SelectContent>
                       {FOURNISSEURS_DATA.map(f => (
@@ -183,11 +184,11 @@ export default function AdminDataPage() {
                 </div>
                 <div className="space-y-2">
                   <Label>Montant Total Actualisé (F CFA)</Label>
-                  <Input type="number" placeholder="Montant total de la dette" />
+                  <Input type="number" placeholder="Montant en F CFA" />
                 </div>
                 <div className="space-y-2">
-                  <Label>Dernière Facture associée (N°)</Label>
-                  <Input placeholder="Optionnel" />
+                  <Label>N° de la dernière Facture</Label>
+                  <Input placeholder="Référence facture" />
                 </div>
                 <Button className="w-full bg-orange-600 hover:bg-orange-700" onClick={() => handleSave("Dettes Fournisseurs")}>
                   Actualiser le Solde
@@ -204,7 +205,7 @@ export default function AdminDataPage() {
                 <CardTitle className="flex items-center gap-2">
                   <Building2 className="w-5 h-5 text-primary" /> Nouvelle Assurance
                 </CardTitle>
-                <CardDescription>Ajouter une nouvelle compagnie d'assurance.</CardDescription>
+                <CardDescription>Ajouter une compagnie d'assurance partenaire.</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="space-y-2">
@@ -213,10 +214,10 @@ export default function AdminDataPage() {
                 </div>
                 <div className="space-y-2">
                   <Label>Type de contrat</Label>
-                  <Input placeholder="Tiers-payant / Remboursement direct" />
+                  <Input placeholder="Tiers-payant / Remboursement" />
                 </div>
                 <Button className="w-full" onClick={() => handleSave("Nouvelle Assurance")}>
-                  Créer l'Assurance
+                  Enregistrer l'Assurance
                 </Button>
               </CardContent>
             </Card>
@@ -224,16 +225,16 @@ export default function AdminDataPage() {
             <Card className="border-none shadow-md">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
-                  <ShieldCheck className="w-5 h-5 text-green-600" /> Montants à Recevoir
+                  <ShieldCheck className="w-5 h-5 text-green-600" /> Créances (Montants à recevoir)
                 </CardTitle>
-                <CardDescription>Mettre à jour les sommes que les assurances doivent à la pharmacie.</CardDescription>
+                <CardDescription>Mettre à jour ce que l'assurance doit à la pharmacie.</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="space-y-2">
                   <Label>Sélectionner l'Assurance</Label>
                   <Select>
                     <SelectTrigger>
-                      <SelectValue placeholder="Choisir l'assurance" />
+                      <SelectValue placeholder="Choisir..." />
                     </SelectTrigger>
                     <SelectContent>
                       {ASSURANCES_DATA.map(a => (
@@ -243,12 +244,12 @@ export default function AdminDataPage() {
                   </Select>
                 </div>
                 <div className="space-y-2">
-                  <Label>Période Concernée</Label>
+                  <Label>Mois Concerné</Label>
                   <Input type="month" />
                 </div>
                 <div className="space-y-2">
-                  <Label>Montant Dû par l'Assurance (F CFA)</Label>
-                  <Input type="number" placeholder="0 F CFA" />
+                  <Label>Montant Total à Percevoir (F CFA)</Label>
+                  <Input type="number" placeholder="Montant en F CFA" />
                 </div>
                 <Button className="w-full bg-green-600 hover:bg-green-700" onClick={() => handleSave("Montants Assurances")}>
                   Mettre à Jour la Créance
@@ -264,13 +265,13 @@ export default function AdminDataPage() {
               <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mb-4">
                 <FileUp className="text-primary w-8 h-8" />
               </div>
-              <h3 className="text-xl font-bold mb-2">Importation en Masse</h3>
+              <h3 className="text-xl font-bold mb-2">Importation Groupée</h3>
               <p className="text-muted-foreground text-center max-w-sm mb-6">
-                Utilisez notre template Excel pour importer toutes vos données du mois en une seule fois.
+                Importez vos données mensuelles via notre template Excel. Tous les calculs seront automatisés.
               </p>
               <Input type="file" className="hidden" id="excel-upload" accept=".xlsx,.xls" />
               <Label htmlFor="excel-upload" className="cursor-pointer bg-primary text-white px-6 py-3 rounded-lg hover:bg-primary/90 transition-colors inline-flex items-center gap-2">
-                Sélectionner le fichier
+                Sélectionner le fichier Excel
               </Label>
             </CardContent>
           </Card>
