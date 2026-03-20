@@ -32,7 +32,7 @@ export const addRecette = (data: any) => {
 export const getFournisseurs = () => getStorage('pharma_fournisseurs', []);
 export const addFournisseur = (data: any) => {
   const current = getFournisseurs();
-  setStorage('pharma_fournisseurs', [...current, { ...data, id: Date.now().toString() }]);
+  setStorage('pharma_fournisseurs', [...current, { ...data, id: Date.now().toString(), consumed: 0 }]);
 };
 
 export const getAssurances = () => getStorage('pharma_assurances', []);
@@ -44,7 +44,7 @@ export const addAssurance = (data: any) => {
 export const getFactures = () => getStorage('pharma_factures', []);
 export const addFacture = (data: any) => {
   const current = getFactures();
-  setStorage('pharma_factures', [...current, { ...data, id: Date.now().toString() }]);
+  setStorage('pharma_factures', [...current, { ...data, id: Date.now().toString(), statut: "En attente" }]);
 };
 
 export const getCreancesAssurance = () => getStorage('pharma_creances_assurance', []);
@@ -53,18 +53,26 @@ export const updateCreanceAssurance = (data: any) => {
   setStorage('pharma_creances_assurance', [...current, { ...data, id: Date.now().toString() }]);
 };
 
+export const getRejets = () => getStorage('pharma_rejets', []);
+
+export const getDcssa = () => getStorage('pharma_dcssa', []);
+
+export const getImplants = () => getStorage('pharma_implants', []);
+
 // Calcul des indicateurs clés (KPI)
 export const getKPIs = () => {
   const recettes = getRecettes();
   const factures = getFactures();
+  const rejets = getRejets();
   
   const totalRecettes = recettes.reduce((acc: number, r: any) => acc + (Number(r.brute) || 0), 0);
   const totalCommandes = factures.reduce((acc: number, f: any) => acc + (Number(f.montant) || 0), 0);
+  const totalRejets = rejets.reduce((acc: number, r: any) => acc + (Number(r.montant) || 0), 0);
   
   return {
     entreesMois: totalRecettes,
     sortiesMois: totalCommandes,
     marge: totalRecettes - totalCommandes,
-    rejets: 0
+    rejets: totalRejets
   };
 };

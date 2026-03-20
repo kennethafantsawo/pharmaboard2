@@ -1,14 +1,29 @@
+
 "use client";
 
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { FOURNISSEURS_DATA, ASSURANCES_DATA } from "@/lib/mock-data";
-import { Trash2, Edit2, ShieldAlert, Globe, Bell } from "lucide-react";
+import { getFournisseurs, getAssurances } from "@/lib/mock-data";
+import { Trash2, Edit2, ShieldAlert, Globe } from "lucide-react";
 
 export default function SettingsPage() {
+  const [fournisseurs, setFournisseurs] = useState<any[]>([]);
+  const [assurances, setAssurances] = useState<any[]>([]);
+
+  useEffect(() => {
+    const load = () => {
+      setFournisseurs(getFournisseurs());
+      setAssurances(getAssurances());
+    };
+    load();
+    window.addEventListener('storage-update', load);
+    return () => window.removeEventListener('storage-update', load);
+  }, []);
+
   return (
     <div className="space-y-8">
       <div>
@@ -22,9 +37,8 @@ export default function SettingsPage() {
             <CardHeader className="flex flex-row items-center justify-between">
               <div>
                 <CardTitle>Gestion des Fournisseurs</CardTitle>
-                <CardDescription>Liste centralisée de tous vos grossistes partenaires.</CardDescription>
+                <CardDescription>Liste de tous vos grossistes partenaires.</CardDescription>
               </div>
-              <Button size="sm">Ajouter</Button>
             </CardHeader>
             <CardContent className="p-0">
               <Table>
@@ -36,10 +50,10 @@ export default function SettingsPage() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {FOURNISSEURS_DATA.map(f => (
+                  {fournisseurs.length > 0 ? fournisseurs.map(f => (
                     <TableRow key={f.id}>
                       <TableCell className="font-medium">{f.name}</TableCell>
-                      <TableCell>{f.contact}</TableCell>
+                      <TableCell>{f.contact || "N/A"}</TableCell>
                       <TableCell className="text-right">
                         <div className="flex justify-end gap-2">
                           <Button variant="ghost" size="icon"><Edit2 className="w-4 h-4" /></Button>
@@ -47,7 +61,9 @@ export default function SettingsPage() {
                         </div>
                       </TableCell>
                     </TableRow>
-                  ))}
+                  )) : (
+                    <TableRow><TableCell colSpan={3} className="text-center py-4">Aucun fournisseur.</TableCell></TableRow>
+                  )}
                 </TableBody>
               </Table>
             </CardContent>
@@ -57,9 +73,8 @@ export default function SettingsPage() {
             <CardHeader className="flex flex-row items-center justify-between">
               <div>
                 <CardTitle>Gestion des Assurances</CardTitle>
-                <CardDescription>Configurez les comptes d'assurance tiers-payant.</CardDescription>
+                <CardDescription>Configurez les comptes d'assurance.</CardDescription>
               </div>
-              <Button size="sm">Ajouter</Button>
             </CardHeader>
             <CardContent className="p-0">
               <Table>
@@ -70,7 +85,7 @@ export default function SettingsPage() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {ASSURANCES_DATA.map(a => (
+                  {assurances.length > 0 ? assurances.map(a => (
                     <TableRow key={a.id}>
                       <TableCell className="font-medium">{a.name}</TableCell>
                       <TableCell className="text-right">
@@ -80,7 +95,9 @@ export default function SettingsPage() {
                         </div>
                       </TableCell>
                     </TableRow>
-                  ))}
+                  )) : (
+                    <TableRow><TableCell colSpan={2} className="text-center py-4">Aucune assurance.</TableCell></TableRow>
+                  )}
                 </TableBody>
               </Table>
             </CardContent>
@@ -101,7 +118,7 @@ export default function SettingsPage() {
               </div>
               <div className="space-y-2">
                 <Label>Devise par défaut</Label>
-                <Input defaultValue="F CFA" />
+                <Input defaultValue="F CFA" readOnly />
               </div>
               <Button className="w-full">Enregistrer</Button>
             </CardContent>
@@ -114,9 +131,8 @@ export default function SettingsPage() {
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              <p className="text-sm text-muted-foreground">Mise à jour régulière conseillée des mots de passe admin et assistant.</p>
+              <p className="text-sm text-muted-foreground">Gérez vos identifiants d'accès.</p>
               <Button variant="outline" className="w-full">Changer Pass Admin</Button>
-              <Button variant="outline" className="w-full">Changer Pass Assistant</Button>
             </CardContent>
           </Card>
         </div>
