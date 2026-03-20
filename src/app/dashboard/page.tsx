@@ -1,59 +1,21 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { TrendingUp, TrendingDown, ArrowUpRight, ArrowDownRight, Coins, Package, Info, Wand2 } from "lucide-react";
+import { TrendingUp, TrendingDown, ArrowUpRight, Coins, Package, Info, Calendar } from "lucide-react";
 import { 
-  BarChart, 
-  Bar, 
   XAxis, 
   YAxis, 
   CartesianGrid, 
   Tooltip, 
   ResponsiveContainer, 
-  Cell,
   LineChart,
   Line,
   Legend
 } from 'recharts';
 import { KPI_OVERVIEW, RECETTES_DATA } from "@/lib/mock-data";
-import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { aiFinancialInsightsForReports, type AiFinancialInsightsForReportsOutput } from "@/ai/flows/ai-financial-insights-for-reports";
 
 export default function DashboardOverview() {
-  const [insights, setInsights] = useState<AiFinancialInsightsForReportsOutput | null>(null);
-  const [loadingInsights, setLoadingInsights] = useState(false);
-
-  const fetchAiInsights = async () => {
-    setLoadingInsights(true);
-    try {
-      const data = await aiFinancialInsightsForReports({
-        reportingPeriod: "Janvier 2026",
-        previousReportingPeriod: "Décembre 2025",
-        currentPeriodData: {
-          totalSales: KPI_OVERVIEW.entreesMois,
-          totalOrders: KPI_OVERVIEW.sortiesMois,
-          estimatedGrossMargin: KPI_OVERVIEW.entreesMois - KPI_OVERVIEW.sortiesMois,
-          dcssaConsumption: 12500,
-          implantsConsumption: 24300,
-          insuranceAmounts: 98200,
-          totalRejectionsLosses: 3200,
-        },
-        evolutionData: {
-          salesPercentageChange: 12,
-          ordersPercentageChange: 8,
-          rejectionsPercentageChange: -5,
-        }
-      });
-      setInsights(data);
-    } catch (error) {
-      console.error("AI Insight error:", error);
-    } finally {
-      setLoadingInsights(false);
-    }
-  };
-
   return (
     <div className="space-y-8">
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
@@ -63,10 +25,6 @@ export default function DashboardOverview() {
         </div>
         <div className="flex items-center gap-2">
           <Badge variant="outline" className="px-3 py-1 bg-white">Mise à jour: Aujourd'hui, 14:30</Badge>
-          <Button onClick={fetchAiInsights} disabled={loadingInsights} className="gap-2 bg-secondary hover:bg-secondary/90 text-white">
-            <Wand2 className="w-4 h-4" />
-            {loadingInsights ? "Analyse..." : "Analyse IA"}
-          </Button>
         </div>
       </div>
 
@@ -157,48 +115,28 @@ export default function DashboardOverview() {
           </CardContent>
         </Card>
 
-        <div className="space-y-6">
-          {insights ? (
-            <Card className="border-none shadow-md bg-primary text-white h-full overflow-y-auto max-h-[500px]">
-              <CardHeader>
-                <div className="flex items-center gap-2">
-                  <Wand2 className="w-5 h-5" />
-                  <CardTitle className="text-lg">Analyses de l'IA</CardTitle>
-                </div>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="space-y-2">
-                  <h4 className="font-semibold text-sm opacity-80 uppercase tracking-wider">Résumé Exécutif</h4>
-                  <p className="text-sm leading-relaxed">{insights.executiveSummary}</p>
-                </div>
-                <div className="space-y-2 pt-2 border-t border-white/20">
-                  <h4 className="font-semibold text-sm opacity-80 uppercase tracking-wider">Points d'Attention</h4>
-                  <ul className="list-disc list-inside text-sm space-y-1">
-                    {insights.pointsDAttention.map((p, i) => <li key={i}>{p}</li>)}
-                  </ul>
-                </div>
-                <div className="space-y-2 pt-2 border-t border-white/20">
-                  <h4 className="font-semibold text-sm opacity-80 uppercase tracking-wider">Recommandations</h4>
-                  <ul className="list-disc list-inside text-sm space-y-1">
-                    {insights.recommendations.map((r, i) => <li key={i}>{r}</li>)}
-                  </ul>
-                </div>
-              </CardContent>
-            </Card>
-          ) : (
-            <Card className="border-none shadow-md h-full flex flex-col items-center justify-center p-8 text-center bg-muted/30 border-dashed border-2">
-              <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center mb-4">
-                <Info className="text-muted-foreground w-6 h-6" />
-              </div>
-              <h3 className="font-semibold mb-2">Pas encore d'analyse IA</h3>
-              <p className="text-sm text-muted-foreground mb-6">Cliquez sur le bouton "Analyse IA" pour générer des insights stratégiques basés sur vos données.</p>
-              <Button onClick={fetchAiInsights} variant="outline" className="gap-2">
-                <Wand2 className="w-4 h-4" />
-                Générer maintenant
-              </Button>
-            </Card>
-          )}
-        </div>
+        <Card className="border-none shadow-md">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Calendar className="w-5 h-5 text-primary" />
+              Événements à venir
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="p-3 bg-muted/30 rounded-lg border-l-4 border-primary">
+              <p className="text-sm font-bold">Inventaire Mensuel</p>
+              <p className="text-xs text-muted-foreground">Demain, 08:00 - Zone Stock A</p>
+            </div>
+            <div className="p-3 bg-muted/30 rounded-lg border-l-4 border-secondary">
+              <p className="text-sm font-bold">Réunion Fournisseurs</p>
+              <p className="text-xs text-muted-foreground">Vendredi, 10:30 - Bureau</p>
+            </div>
+            <div className="p-3 bg-muted/30 rounded-lg border-l-4 border-orange-400">
+              <p className="text-sm font-bold">Vérification des Périmés</p>
+              <p className="text-xs text-muted-foreground">25 Janvier - Équipe Assistante</p>
+            </div>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );
