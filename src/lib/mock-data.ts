@@ -1,76 +1,143 @@
-"use client";
+import { supabase } from './supabase';
 
-// Utilitaire pour gérer la persistance locale simple pour le prototype
-const isClient = typeof window !== 'undefined';
+// Fonctions d'accès aux données via Supabase
 
-const getStorage = (key: string, defaultValue: any) => {
-  if (!isClient) return defaultValue;
-  const saved = localStorage.getItem(key);
-  try {
-    return saved ? JSON.parse(saved) : defaultValue;
-  } catch (e) {
-    return defaultValue;
-  }
+export const getRecettes = async () => {
+  const { data, error } = await supabase
+    .from('recettes')
+    .select('*')
+    .order('date', { ascending: false });
+  if (error) throw error;
+  return data || [];
 };
 
-const setStorage = (key: string, data: any) => {
-  if (isClient) {
-    localStorage.setItem(key, JSON.stringify(data));
-    // Déclencher un événement personnalisé pour informer les autres composants
-    window.dispatchEvent(new Event('storage-update'));
-  }
+export const addRecette = async (recette: any) => {
+  const { data, error } = await supabase
+    .from('recettes')
+    .insert([recette])
+    .select();
+  if (error) throw error;
+  return data;
 };
 
-// Fonctions d'accès aux données
-export const getRecettes = () => getStorage('pharma_recettes', []);
-export const addRecette = (data: any) => {
-  const current = getRecettes();
-  setStorage('pharma_recettes', [...current, { ...data, id: Date.now().toString() }]);
+export const getFournisseurs = async () => {
+  const { data, error } = await supabase
+    .from('fournisseurs')
+    .select('*')
+    .order('name');
+  if (error) throw error;
+  return data || [];
 };
 
-export const getFournisseurs = () => getStorage('pharma_fournisseurs', []);
-export const addFournisseur = (data: any) => {
-  const current = getFournisseurs();
-  setStorage('pharma_fournisseurs', [...current, { ...data, id: Date.now().toString() }]);
-};
-export const deleteFournisseur = (id: string) => {
-  const current = getFournisseurs();
-  setStorage('pharma_fournisseurs', current.filter((f: any) => f.id !== id));
-};
-
-export const getAssurances = () => getStorage('pharma_assurances', []);
-export const addAssurance = (data: any) => {
-  const current = getAssurances();
-  setStorage('pharma_assurances', [...current, { ...data, id: Date.now().toString() }]);
-};
-export const deleteAssurance = (id: string) => {
-  const current = getAssurances();
-  setStorage('pharma_assurances', current.filter((a: any) => a.id !== id));
+export const addFournisseur = async (fournisseur: any) => {
+  const { data, error } = await supabase
+    .from('fournisseurs')
+    .insert([fournisseur])
+    .select();
+  if (error) throw error;
+  return data;
 };
 
-export const getFactures = () => getStorage('pharma_factures', []);
-export const addFacture = (data: any) => {
-  const current = getFactures();
-  setStorage('pharma_factures', [...current, { ...data, id: Date.now().toString(), statut: "En attente" }]);
+export const deleteFournisseur = async (id: string) => {
+  const { error } = await supabase
+    .from('fournisseurs')
+    .delete()
+    .eq('id', id);
+  if (error) throw error;
 };
 
-export const getCreancesAssurance = () => getStorage('pharma_creances_assurance', []);
-export const updateCreanceAssurance = (data: any) => {
-  const current = getCreancesAssurance();
-  setStorage('pharma_creances_assurance', [...current, { ...data, id: Date.now().toString() }]);
+export const getAssurances = async () => {
+  const { data, error } = await supabase
+    .from('assurances')
+    .select('*')
+    .order('name');
+  if (error) throw error;
+  return data || [];
 };
 
-export const getRejets = () => getStorage('pharma_rejets', []);
+export const addAssurance = async (assurance: any) => {
+  const { data, error } = await supabase
+    .from('assurances')
+    .insert([assurance])
+    .select();
+  if (error) throw error;
+  return data;
+};
 
-export const getDcssa = () => getStorage('pharma_dcssa', []);
+export const deleteAssurance = async (id: string) => {
+  const { error } = await supabase
+    .from('assurances')
+    .delete()
+    .eq('id', id);
+  if (error) throw error;
+};
 
-export const getImplants = () => getStorage('pharma_implants', []);
+export const getFactures = async () => {
+  const { data, error } = await supabase
+    .from('factures')
+    .select('*')
+    .order('date', { ascending: false });
+  if (error) throw error;
+  return data || [];
+};
 
-// Calcul des indicateurs clés (KPI)
-export const getKPIs = () => {
-  const recettes = getRecettes();
-  const factures = getFactures();
-  const rejets = getRejets();
+export const addFacture = async (facture: any) => {
+  const { data, error } = await supabase
+    .from('factures')
+    .insert([{ ...facture, statut: "En attente" }])
+    .select();
+  if (error) throw error;
+  return data;
+};
+
+export const getCreancesAssurance = async () => {
+  const { data, error } = await supabase
+    .from('creances_assurance')
+    .select('*');
+  if (error) throw error;
+  return data || [];
+};
+
+export const updateCreanceAssurance = async (creance: any) => {
+  const { data, error } = await supabase
+    .from('creances_assurance')
+    .insert([creance])
+    .select();
+  if (error) throw error;
+  return data;
+};
+
+export const getRejets = async () => {
+  const { data, error } = await supabase
+    .from('rejets')
+    .select('*');
+  if (error) throw error;
+  return data || [];
+};
+
+export const getDcssa = async () => {
+  const { data, error } = await supabase
+    .from('dcssa')
+    .select('*');
+  if (error) throw error;
+  return data || [];
+};
+
+export const getImplants = async () => {
+  const { data, error } = await supabase
+    .from('implants')
+    .select('*');
+  if (error) throw error;
+  return data || [];
+};
+
+// Calcul des indicateurs clés (KPI) - Version asynchrone
+export const getKPIs = async () => {
+  const [recettes, factures, rejets] = await Promise.all([
+    getRecettes(),
+    getFactures(),
+    getRejets()
+  ]);
   
   const totalRecettes = recettes.reduce((acc: number, r: any) => acc + (Number(r.brute) || 0), 0);
   const totalCommandes = factures.reduce((acc: number, f: any) => acc + (Number(f.montant) || 0), 0);

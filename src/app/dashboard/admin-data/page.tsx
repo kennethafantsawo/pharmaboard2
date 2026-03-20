@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState, useEffect } from "react";
@@ -13,7 +12,7 @@ import {
   SelectTrigger, 
   SelectValue 
 } from "@/components/ui/select";
-import { Lock, FileUp, Save, History, Database, PlusCircle, CreditCard, Building2, ShieldCheck } from "lucide-react";
+import { Lock, Save, Database, PlusCircle, CreditCard, Building2, ShieldCheck, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { addRecette, addFournisseur, addAssurance, addFacture, updateCreanceAssurance, getFournisseurs, getAssurances } from "@/lib/mock-data";
@@ -23,14 +22,23 @@ export default function AdminDataPage() {
   const [adminPass, setAdminPass] = useState("");
   const { toast } = useToast();
   
-  // States pour les listes (fournisseurs et assurances enregistrés)
+  const [loading, setLoading] = useState(false);
   const [fournisseurs, setFournisseurs] = useState<any[]>([]);
   const [assurances, setAssurances] = useState<any[]>([]);
 
+  const refreshLookups = async () => {
+    try {
+      const [f, a] = await Promise.all([getFournisseurs(), getAssurances()]);
+      setFournisseurs(f);
+      setAssurances(a);
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
   useEffect(() => {
     if (isAuthenticated) {
-      setFournisseurs(getFournisseurs());
-      setAssurances(getAssurances());
+      refreshLookups();
     }
   }, [isAuthenticated]);
 
@@ -38,7 +46,7 @@ export default function AdminDataPage() {
     e.preventDefault();
     if (adminPass === "admin123") {
       setIsAuthenticated(true);
-      toast({ title: "Mode Administrateur Activé", description: "Vous pouvez maintenant modifier les données." });
+      toast({ title: "Mode Administrateur Activé", description: "Connexion sécurisée établie." });
     } else {
       toast({ variant: "destructive", title: "Accès refusé", description: "Mot de passe incorrect." });
     }
@@ -46,48 +54,84 @@ export default function AdminDataPage() {
 
   // Gestion Recettes
   const [recetteForm, setRecetteForm] = useState({ date: "", brute: "", tierPayant: "", credit: "", remises: "" });
-  const handleSaveRecette = () => {
+  const handleSaveRecette = async () => {
     if (!recetteForm.date || !recetteForm.brute) return toast({ variant: "destructive", title: "Erreur", description: "Date et Recette Brute obligatoires." });
-    addRecette(recetteForm);
-    toast({ title: "Succès", description: "Recette enregistrée." });
-    setRecetteForm({ date: "", brute: "", tierPayant: "", credit: "", remises: "" });
+    setLoading(true);
+    try {
+      await addRecette(recetteForm);
+      toast({ title: "Succès", description: "Recette enregistrée dans Supabase." });
+      setRecetteForm({ date: "", brute: "", tierPayant: "", credit: "", remises: "" });
+    } catch (e) {
+      toast({ variant: "destructive", title: "Erreur", description: "Erreur lors de l'enregistrement." });
+    } finally {
+      setLoading(false);
+    }
   };
 
   // Gestion Fournisseurs
-  const [fournForm, setFournForm] = useState({ name: "", contact: "", email: "" });
-  const handleCreateFournisseur = () => {
+  const [fournForm, setFournForm] = useState({ name: "", contact: "" });
+  const handleCreateFournisseur = async () => {
     if (!fournForm.name) return;
-    addFournisseur(fournForm);
-    setFournisseurs(getFournisseurs());
-    toast({ title: "Succès", description: "Fournisseur créé." });
-    setFournForm({ name: "", contact: "", email: "" });
+    setLoading(true);
+    try {
+      await addFournisseur(fournForm);
+      await refreshLookups();
+      toast({ title: "Succès", description: "Fournisseur créé." });
+      setFournForm({ name: "", contact: "" });
+    } catch (e) {
+      toast({ variant: "destructive", title: "Erreur", description: "Erreur Supabase." });
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const [detteForm, setDetteForm] = useState({ fournisseurId: "", montant: "", facture: "" });
-  const handleSaveFacture = () => {
+  const [detteForm, setDetteForm] = useState({ fournisseurId: "", montant: "", factures: "" });
+  const handleSaveFacture = async () => {
     if (!detteForm.fournisseurId || !detteForm.montant) return;
-    const f = fournisseurs.find(x => x.id === detteForm.fournisseurId);
-    addFacture({ ...detteForm, fournisseur: f?.name, date: new Date().toLocaleDateString(), statut: "En attente" });
-    toast({ title: "Succès", description: "Facture/Dette enregistrée." });
-    setDetteForm({ fournisseurId: "", montant: "", facture: "" });
+    setLoading(true);
+    try {
+      const f = fournisseurs.find(x => x.id === detteForm.fournisseurId);
+      await addFacture({ ...detteForm, fournisseur: f?.name, date: new Date().toISOString().split('T')[0] });
+      toast({ title: "Succès", description: "Facture enregistrée." });
+      setDetteForm({ fournisseurId: "", montant: "", factures: "" });
+    } catch (e) {
+      toast({ variant: "destructive", title: "Erreur", description: "Erreur Supabase." });
+    } finally {
+      setLoading(false);
+    }
   };
 
   // Gestion Assurances
   const [assuForm, setAssuForm] = useState({ name: "", typeContrat: "" });
-  const handleCreateAssurance = () => {
+  const handleCreateAssurance = async () => {
     if (!assuForm.name) return;
-    addAssurance(assuForm);
-    setAssurances(getAssurances());
-    toast({ title: "Succès", description: "Assurance ajoutée." });
-    setAssuForm({ name: "", typeContrat: "" });
+    setLoading(true);
+    try {
+      await addAssurance(assuForm);
+      await refreshLookups();
+      toast({ title: "Succès", description: "Assurance ajoutée." });
+      setAssuForm({ name: "", typeContrat: "" });
+    } catch (e) {
+      toast({ variant: "destructive", title: "Erreur", description: "Erreur Supabase." });
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const [creanceForm, setCreanceForm] = useState({ assuranceId: "", mois: "", montant: "" });
-  const handleUpdateCreance = () => {
+  const [creanceForm, setCreanceForm] = useState({ assuranceId: "", montant: "" });
+  const handleUpdateCreance = async () => {
     if (!creanceForm.assuranceId || !creanceForm.montant) return;
-    updateCreanceAssurance(creanceForm);
-    toast({ title: "Succès", description: "Créance assurance mise à jour." });
-    setCreanceForm({ assuranceId: "", mois: "", montant: "" });
+    setLoading(true);
+    try {
+      const a = assurances.find(x => x.id === creanceForm.assuranceId);
+      await updateCreanceAssurance({ ...creanceForm, insurance: a?.name, date: new Date().toISOString().split('T')[0] });
+      toast({ title: "Succès", description: "Créance mise à jour." });
+      setCreanceForm({ assuranceId: "", montant: "" });
+    } catch (e) {
+      toast({ variant: "destructive", title: "Erreur", description: "Erreur Supabase." });
+    } finally {
+      setLoading(false);
+    }
   };
 
   if (!isAuthenticated) {
@@ -99,7 +143,7 @@ export default function AdminDataPage() {
               <Lock className="text-orange-600" />
             </div>
             <CardTitle>Protection Supplémentaire</CardTitle>
-            <CardDescription>Entrez le mot de passe administrateur pour mettre à jour les données.</CardDescription>
+            <CardDescription>Entrez le mot de passe admin pour modifier Supabase.</CardDescription>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleAuth} className="space-y-4">
@@ -126,10 +170,11 @@ export default function AdminDataPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-headline font-bold flex items-center gap-2">
-            <Database className="text-orange-600" /> Mise à Jour des Données
+            <Database className="text-orange-600" /> Mise à Jour Supabase
           </h1>
-          <p className="text-muted-foreground">Gestion des entrées journalières, fournisseurs et créances assurances.</p>
+          <p className="text-muted-foreground">Gestion des données réelles de la pharmacie.</p>
         </div>
+        {loading && <Loader2 className="w-6 h-6 animate-spin text-primary" />}
       </div>
 
       <Tabs defaultValue="recettes" className="w-full">
@@ -168,7 +213,7 @@ export default function AdminDataPage() {
                   <Input type="number" placeholder="0 F CFA" value={recetteForm.remises} onChange={(e) => setRecetteForm({...recetteForm, remises: e.target.value})} />
                 </div>
               </div>
-              <Button className="w-full bg-primary gap-2" onClick={handleSaveRecette}>
+              <Button disabled={loading} className="w-full bg-primary gap-2" onClick={handleSaveRecette}>
                 <Save className="w-4 h-4" /> Enregistrer les Recettes
               </Button>
             </CardContent>
@@ -182,7 +227,6 @@ export default function AdminDataPage() {
                 <CardTitle className="flex items-center gap-2">
                   <PlusCircle className="w-5 h-5 text-primary" /> Nouveau Fournisseur
                 </CardTitle>
-                <CardDescription>Ajouter un nouveau grossiste partenaire.</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="space-y-2">
@@ -190,19 +234,18 @@ export default function AdminDataPage() {
                   <Input placeholder="Ex: Labo Pharma" value={fournForm.name} onChange={(e) => setFournForm({...fournForm, name: e.target.value})} />
                 </div>
                 <div className="space-y-2">
-                  <Label>Contact / Téléphone</Label>
+                  <Label>Contact</Label>
                   <Input placeholder="+221 ..." value={fournForm.contact} onChange={(e) => setFournForm({...fournForm, contact: e.target.value})} />
                 </div>
-                <Button className="w-full" onClick={handleCreateFournisseur}>Créer le profil</Button>
+                <Button disabled={loading} className="w-full" onClick={handleCreateFournisseur}>Créer le profil</Button>
               </CardContent>
             </Card>
 
             <Card className="border-none shadow-md">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
-                  <CreditCard className="w-5 h-5 text-orange-600" /> Montants Dus (Dettes)
+                  <CreditCard className="w-5 h-5 text-orange-600" /> Facture Fournisseur
                 </CardTitle>
-                <CardDescription>Enregistrer une nouvelle facture fournisseur.</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="space-y-2">
@@ -220,9 +263,9 @@ export default function AdminDataPage() {
                 </div>
                 <div className="space-y-2">
                   <Label>Montant Facture (F CFA)</Label>
-                  <Input type="number" placeholder="Montant en F CFA" value={detteForm.montant} onChange={(e) => setDetteForm({...detteForm, montant: e.target.value})} />
+                  <Input type="number" placeholder="0 F CFA" value={detteForm.montant} onChange={(e) => setDetteForm({...detteForm, montant: e.target.value})} />
                 </div>
-                <Button className="w-full bg-orange-600 hover:bg-orange-700" onClick={handleSaveFacture}>
+                <Button disabled={loading} className="w-full bg-orange-600 hover:bg-orange-700" onClick={handleSaveFacture}>
                   Enregistrer la Facture
                 </Button>
               </CardContent>
@@ -237,27 +280,21 @@ export default function AdminDataPage() {
                 <CardTitle className="flex items-center gap-2">
                   <Building2 className="w-5 h-5 text-primary" /> Nouvelle Assurance
                 </CardTitle>
-                <CardDescription>Ajouter une compagnie d'assurance partenaire.</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="space-y-2">
                   <Label>Nom de l'Assurance</Label>
-                  <Input placeholder="Ex: AXA, Allianz..." value={assuForm.name} onChange={(e) => setAssuForm({...assuForm, name: e.target.value})} />
+                  <Input placeholder="Ex: AXA" value={assuForm.name} onChange={(e) => setAssuForm({...assuForm, name: e.target.value})} />
                 </div>
-                <div className="space-y-2">
-                  <Label>Type de contrat</Label>
-                  <Input placeholder="Tiers-payant" value={assuForm.typeContrat} onChange={(e) => setAssuForm({...assuForm, typeContrat: e.target.value})} />
-                </div>
-                <Button className="w-full" onClick={handleCreateAssurance}>Enregistrer l'Assurance</Button>
+                <Button disabled={loading} className="w-full" onClick={handleCreateAssurance}>Enregistrer</Button>
               </CardContent>
             </Card>
 
             <Card className="border-none shadow-md">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
-                  <ShieldCheck className="w-5 h-5 text-green-600" /> Créances (Montants à recevoir)
+                  <PlusCircle className="w-5 h-5 text-green-600" /> Créance Assurance
                 </CardTitle>
-                <CardDescription>Mettre à jour ce que l'assurance doit.</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="space-y-2">
@@ -274,10 +311,10 @@ export default function AdminDataPage() {
                   </Select>
                 </div>
                 <div className="space-y-2">
-                  <Label>Montant à Recevoir (F CFA)</Label>
-                  <Input type="number" placeholder="Montant en F CFA" value={creanceForm.montant} onChange={(e) => setCreanceForm({...creanceForm, montant: e.target.value})} />
+                  <Label>Montant Créance (F CFA)</Label>
+                  <Input type="number" placeholder="0 F CFA" value={creanceForm.montant} onChange={(e) => setCreanceForm({...creanceForm, montant: e.target.value})} />
                 </div>
-                <Button className="w-full bg-green-600 hover:bg-green-700" onClick={handleUpdateCreance}>
+                <Button disabled={loading} className="w-full bg-green-600 hover:bg-green-700" onClick={handleUpdateCreance}>
                   Mettre à Jour la Créance
                 </Button>
               </CardContent>

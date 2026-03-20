@@ -1,9 +1,8 @@
-
 "use client";
 
 import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Coins, Package, ArrowUpRight, Info } from "lucide-react";
+import { Coins, Package, ArrowUpRight, Info, Loader2 } from "lucide-react";
 import { 
   XAxis, 
   YAxis, 
@@ -18,18 +17,33 @@ import { getKPIs, getRecettes } from "@/lib/mock-data";
 import { Badge } from "@/components/ui/badge";
 
 export default function DashboardOverview() {
-  const [kpis, setKpis] = useState(getKPIs());
-  const [chartData, setChartData] = useState(getRecettes());
+  const [loading, setLoading] = useState(true);
+  const [kpis, setKpis] = useState({ entreesMois: 0, sortiesMois: 0, marge: 0, rejets: 0 });
+  const [chartData, setChartData] = useState<any[]>([]);
 
   useEffect(() => {
-    const refreshData = () => {
-      setKpis(getKPIs());
-      setChartData(getRecettes());
+    const fetchData = async () => {
+      try {
+        const [kpiData, recettesData] = await Promise.all([getKPIs(), getRecettes()]);
+        setKpis(kpiData);
+        setChartData(recettesData);
+      } catch (err) {
+        console.error("Erreur chargement dashboard:", err);
+      } finally {
+        setLoading(false);
+      }
     };
     
-    window.addEventListener('storage-update', refreshData);
-    return () => window.removeEventListener('storage-update', refreshData);
+    fetchData();
   }, []);
+
+  if (loading) {
+    return (
+      <div className="flex h-[70vh] items-center justify-center">
+        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-8">
@@ -39,7 +53,7 @@ export default function DashboardOverview() {
           <p className="text-muted-foreground">Bienvenue, Directrice. Voici l'état actuel de la pharmacie.</p>
         </div>
         <div className="flex items-center gap-2">
-          <Badge variant="outline" className="px-3 py-1 bg-white">Mise à jour: Temps réel</Badge>
+          <Badge variant="outline" className="px-3 py-1 bg-white">Devise: F CFA</Badge>
         </div>
       </div>
 
@@ -84,7 +98,7 @@ export default function DashboardOverview() {
             <Info className="h-4 w-4 text-red-400" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">0 F CFA</div>
+            <div className="text-2xl font-bold">{kpis.rejets.toLocaleString()} F CFA</div>
           </CardContent>
         </Card>
       </div>
@@ -92,7 +106,7 @@ export default function DashboardOverview() {
       <Card className="border-none shadow-md">
         <CardHeader>
           <CardTitle>Evolution des Ventes</CardTitle>
-          <CardDescription>Graphique basé sur vos saisies journalières (F CFA)</CardDescription>
+          <CardDescription>Graphique basé sur vos saisies (F CFA)</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="h-[450px] w-full flex items-center justify-center">

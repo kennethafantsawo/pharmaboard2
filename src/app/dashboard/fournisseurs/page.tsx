@@ -1,30 +1,34 @@
-
 "use client";
 
 import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Package, FileText, Clock } from "lucide-react";
+import { Package, FileText, Clock, Loader2 } from "lucide-react";
 import { getFactures, getFournisseurs } from "@/lib/mock-data";
 import { Badge } from "@/components/ui/badge";
 
 export default function FournisseursPage() {
+  const [loading, setLoading] = useState(true);
   const [factures, setFactures] = useState<any[]>([]);
   const [fournisseurs, setFournisseurs] = useState<any[]>([]);
 
   useEffect(() => {
-    // Initial load
-    setFactures(getFactures());
-    setFournisseurs(getFournisseurs());
-
-    const refresh = () => {
-      setFactures(getFactures());
-      setFournisseurs(getFournisseurs());
+    const loadData = async () => {
+      try {
+        const [f, s] = await Promise.all([getFactures(), getFournisseurs()]);
+        setFactures(f);
+        setFournisseurs(s);
+      } catch (e) {
+        console.error(e);
+      } finally {
+        setLoading(false);
+      }
     };
-    window.addEventListener('storage-update', refresh);
-    return () => window.removeEventListener('storage-update', refresh);
+    loadData();
   }, []);
+
+  if (loading) return <div className="flex h-[50vh] items-center justify-center"><Loader2 className="animate-spin" /></div>;
 
   return (
     <div className="space-y-6">
@@ -62,7 +66,7 @@ export default function FournisseursPage() {
                     </TableRow>
                   ))
                 ) : (
-                  <TableRow><TableCell colSpan={4} className="text-center py-8">Aucune facture enregistrée.</TableCell></TableRow>
+                  <TableRow><TableCell colSpan={4} className="text-center py-8 text-muted-foreground">Aucune facture en attente.</TableCell></TableRow>
                 )}
               </TableBody>
             </Table>
@@ -87,7 +91,7 @@ export default function FournisseursPage() {
                     </TableRow>
                   ))
                 ) : (
-                  <TableRow><TableCell colSpan={2} className="text-center py-8">Aucun fournisseur enregistré.</TableCell></TableRow>
+                  <TableRow><TableCell colSpan={2} className="text-center py-8 text-muted-foreground">Aucun fournisseur enregistré.</TableCell></TableRow>
                 )}
               </TableBody>
             </Table>
