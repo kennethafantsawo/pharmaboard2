@@ -12,9 +12,10 @@ import {
   SelectTrigger, 
   SelectValue 
 } from "@/components/ui/select";
-import { Lock, FileUp, Save, History, Database } from "lucide-react";
+import { Lock, FileUp, Save, History, Database, PlusCircle, CreditCard, Building2, ShieldCheck } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { FOURNISSEURS_DATA, ASSURANCES_DATA } from "@/lib/mock-data";
 
 export default function AdminDataPage() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -29,6 +30,13 @@ export default function AdminDataPage() {
     } else {
       toast({ variant: "destructive", title: "Accès refusé", description: "Mot de passe incorrect." });
     }
+  };
+
+  const handleSave = (category: string) => {
+    toast({
+      title: "Données enregistrées",
+      description: `Les modifications pour ${category} ont été prises en compte.`,
+    });
   };
 
   if (!isAuthenticated) {
@@ -69,20 +77,20 @@ export default function AdminDataPage() {
           <h1 className="text-3xl font-headline font-bold flex items-center gap-2">
             <Database className="text-orange-600" /> Mise à Jour des Données
           </h1>
-          <p className="text-muted-foreground">Ajoutez ou modifiez les entrées journalières et mensuelles.</p>
+          <p className="text-muted-foreground">Ajoutez ou modifiez les entrées journalières, les fournisseurs et les assurances.</p>
         </div>
         <div className="flex gap-2">
           <Button variant="outline" className="gap-2">
-            <FileUp className="w-4 h-4" /> Télécharger Template Excel
+            <FileUp className="w-4 h-4" /> Télécharger Template
           </Button>
           <Button variant="outline" className="gap-2">
-            <History className="w-4 h-4" /> Logs d'Audit
+            <History className="w-4 h-4" /> Logs
           </Button>
         </div>
       </div>
 
       <Tabs defaultValue="recettes" className="w-full">
-        <TabsList className="bg-white border border-border p-1 h-12 shadow-sm rounded-xl mb-6">
+        <TabsList className="bg-white border border-border p-1 h-12 shadow-sm rounded-xl mb-6 flex overflow-x-auto whitespace-nowrap">
           <TabsTrigger value="recettes">Recettes</TabsTrigger>
           <TabsTrigger value="fournisseurs">Fournisseurs</TabsTrigger>
           <TabsTrigger value="assurances">Assurances</TabsTrigger>
@@ -121,11 +129,133 @@ export default function AdminDataPage() {
                   <Input type="number" placeholder="0.00 €" />
                 </div>
               </div>
-              <Button className="w-full bg-primary gap-2">
-                <Save className="w-4 h-4" /> Enregistrer les Données
+              <Button className="w-full bg-primary gap-2" onClick={() => handleSave("Recettes")}>
+                <Save className="w-4 h-4" /> Enregistrer les Recettes
               </Button>
             </CardContent>
           </Card>
+        </TabsContent>
+
+        <TabsContent value="fournisseurs">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <Card className="border-none shadow-md">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <PlusCircle className="w-5 h-5 text-primary" /> Nouveau Fournisseur
+                </CardTitle>
+                <CardDescription>Ajouter une nouvelle entité à la base de données.</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="space-y-2">
+                  <Label>Nom du Fournisseur / Grossiste</Label>
+                  <Input placeholder="Ex: Grossiste Pharma X" />
+                </div>
+                <div className="space-y-2">
+                  <Label>Contact (Téléphone/Email)</Label>
+                  <Input placeholder="Contact principal" />
+                </div>
+                <Button className="w-full" onClick={() => handleSave("Nouveau Fournisseur")}>
+                  Créer le Fournisseur
+                </Button>
+              </CardContent>
+            </Card>
+
+            <Card className="border-none shadow-md">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <CreditCard className="w-5 h-5 text-orange-600" /> Montants Dus (Dettes)
+                </CardTitle>
+                <CardDescription>Mettre à jour le montant total dû à un fournisseur.</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="space-y-2">
+                  <Label>Sélectionner le Fournisseur</Label>
+                  <Select>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Choisir un fournisseur" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {FOURNISSEURS_DATA.map(f => (
+                        <SelectItem key={f.id} value={f.id}>{f.name}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <Label>Montant Total Actualisé (€)</Label>
+                  <Input type="number" placeholder="Montant total de la dette" />
+                </div>
+                <div className="space-y-2">
+                  <Label>Dernière Facture associée (N°)</Label>
+                  <Input placeholder="Optionnel" />
+                </div>
+                <Button className="w-full bg-orange-600 hover:bg-orange-700" onClick={() => handleSave("Dettes Fournisseurs")}>
+                  Actualiser le Solde
+                </Button>
+              </CardContent>
+            </Card>
+          </div>
+        </TabsContent>
+
+        <TabsContent value="assurances">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <Card className="border-none shadow-md">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Building2 className="w-5 h-5 text-primary" /> Nouvelle Assurance
+                </CardTitle>
+                <CardDescription>Ajouter une nouvelle compagnie d'assurance.</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="space-y-2">
+                  <Label>Nom de l'Assurance</Label>
+                  <Input placeholder="Ex: AXA, Allianz..." />
+                </div>
+                <div className="space-y-2">
+                  <Label>Type de contrat</Label>
+                  <Input placeholder="Tiers-payant / Remboursement direct" />
+                </div>
+                <Button className="w-full" onClick={() => handleSave("Nouvelle Assurance")}>
+                  Créer l'Assurance
+                </Button>
+              </CardContent>
+            </Card>
+
+            <Card className="border-none shadow-md">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <ShieldCheck className="w-5 h-5 text-green-600" /> Montants à Recevoir
+                </CardTitle>
+                <CardDescription>Mettre à jour les sommes que les assurances doivent à la pharmacie.</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="space-y-2">
+                  <Label>Sélectionner l'Assurance</Label>
+                  <Select>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Choisir l'assurance" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {ASSURANCES_DATA.map(a => (
+                        <SelectItem key={a.id} value={a.id}>{a.name}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <Label>Période Concernée</Label>
+                  <Input type="month" />
+                </div>
+                <div className="space-y-2">
+                  <Label>Montant Dû par l'Assurance (€)</Label>
+                  <Input type="number" placeholder="0.00 €" />
+                </div>
+                <Button className="w-full bg-green-600 hover:bg-green-700" onClick={() => handleSave("Montants Assurances")}>
+                  Mettre à Jour la Créance
+                </Button>
+              </CardContent>
+            </Card>
+          </div>
         </TabsContent>
 
         <TabsContent value="excel">
