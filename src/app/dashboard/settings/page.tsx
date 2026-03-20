@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState, useEffect } from "react";
@@ -7,12 +6,14 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { getFournisseurs, getAssurances } from "@/lib/mock-data";
+import { getFournisseurs, getAssurances, deleteFournisseur, deleteAssurance } from "@/lib/mock-data";
 import { Trash2, Edit2, ShieldAlert, Globe } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 export default function SettingsPage() {
   const [fournisseurs, setFournisseurs] = useState<any[]>([]);
   const [assurances, setAssurances] = useState<any[]>([]);
+  const { toast } = useToast();
 
   useEffect(() => {
     const load = () => {
@@ -23,6 +24,22 @@ export default function SettingsPage() {
     window.addEventListener('storage-update', load);
     return () => window.removeEventListener('storage-update', load);
   }, []);
+
+  const handleDeleteFournisseur = (id: string) => {
+    deleteFournisseur(id);
+    toast({
+      title: "Fournisseur supprimé",
+      description: "Le fournisseur a été retiré de la liste avec succès.",
+    });
+  };
+
+  const handleDeleteAssurance = (id: string) => {
+    deleteAssurance(id);
+    toast({
+      title: "Assurance supprimée",
+      description: "L'assurance a été retirée de la liste avec succès.",
+    });
+  };
 
   return (
     <div className="space-y-8">
@@ -56,8 +73,17 @@ export default function SettingsPage() {
                       <TableCell>{f.contact || "N/A"}</TableCell>
                       <TableCell className="text-right">
                         <div className="flex justify-end gap-2">
-                          <Button variant="ghost" size="icon"><Edit2 className="w-4 h-4" /></Button>
-                          <Button variant="ghost" size="icon" className="text-destructive"><Trash2 className="w-4 h-4" /></Button>
+                          <Button variant="ghost" size="icon">
+                            <Edit2 className="w-4 h-4" />
+                          </Button>
+                          <Button 
+                            variant="ghost" 
+                            size="icon" 
+                            className="text-destructive"
+                            onClick={() => handleDeleteFournisseur(f.id)}
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </Button>
                         </div>
                       </TableCell>
                     </TableRow>
@@ -90,8 +116,17 @@ export default function SettingsPage() {
                       <TableCell className="font-medium">{a.name}</TableCell>
                       <TableCell className="text-right">
                         <div className="flex justify-end gap-2">
-                          <Button variant="ghost" size="icon"><Edit2 className="w-4 h-4" /></Button>
-                          <Button variant="ghost" size="icon" className="text-destructive"><Trash2 className="w-4 h-4" /></Button>
+                          <Button variant="ghost" size="icon">
+                            <Edit2 className="w-4 h-4" />
+                          </Button>
+                          <Button 
+                            variant="ghost" 
+                            size="icon" 
+                            className="text-destructive"
+                            onClick={() => handleDeleteAssurance(a.id)}
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </Button>
                         </div>
                       </TableCell>
                     </TableRow>

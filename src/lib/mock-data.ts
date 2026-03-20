@@ -33,11 +33,19 @@ export const addFournisseur = (data: any) => {
   const current = getFournisseurs();
   setStorage('pharma_fournisseurs', [...current, { ...data, id: Date.now().toString() }]);
 };
+export const deleteFournisseur = (id: string) => {
+  const current = getFournisseurs();
+  setStorage('pharma_fournisseurs', current.filter((f: any) => f.id !== id));
+};
 
 export const getAssurances = () => getStorage('pharma_assurances', []);
 export const addAssurance = (data: any) => {
   const current = getAssurances();
   setStorage('pharma_assurances', [...current, { ...data, id: Date.now().toString() }]);
+};
+export const deleteAssurance = (id: string) => {
+  const current = getAssurances();
+  setStorage('pharma_assurances', current.filter((a: any) => a.id !== id));
 };
 
 export const getFactures = () => getStorage('pharma_factures', []);
