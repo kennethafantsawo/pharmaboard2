@@ -7,7 +7,11 @@ const isClient = typeof window !== 'undefined';
 const getStorage = (key: string, defaultValue: any) => {
   if (!isClient) return defaultValue;
   const saved = localStorage.getItem(key);
-  return saved ? JSON.parse(saved) : defaultValue;
+  try {
+    return saved ? JSON.parse(saved) : defaultValue;
+  } catch (e) {
+    return defaultValue;
+  }
 };
 
 const setStorage = (key: string, data: any) => {
@@ -18,10 +22,11 @@ const setStorage = (key: string, data: any) => {
   }
 };
 
+// Fonctions d'accès aux données
 export const getRecettes = () => getStorage('pharma_recettes', []);
 export const addRecette = (data: any) => {
   const current = getRecettes();
-  setStorage('pharma_recettes', [...current, data]);
+  setStorage('pharma_recettes', [...current, { ...data, id: Date.now().toString() }]);
 };
 
 export const getFournisseurs = () => getStorage('pharma_fournisseurs', []);
@@ -45,9 +50,10 @@ export const addFacture = (data: any) => {
 export const getCreancesAssurance = () => getStorage('pharma_creances_assurance', []);
 export const updateCreanceAssurance = (data: any) => {
   const current = getCreancesAssurance();
-  setStorage('pharma_creances_assurance', [...current, data]);
+  setStorage('pharma_creances_assurance', [...current, { ...data, id: Date.now().toString() }]);
 };
 
+// Calcul des indicateurs clés (KPI)
 export const getKPIs = () => {
   const recettes = getRecettes();
   const factures = getFactures();

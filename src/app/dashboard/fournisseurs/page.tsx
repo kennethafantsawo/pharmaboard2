@@ -5,15 +5,19 @@ import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Package, FileText, CheckCircle2, Clock } from "lucide-react";
+import { Package, FileText, Clock } from "lucide-react";
 import { getFactures, getFournisseurs } from "@/lib/mock-data";
 import { Badge } from "@/components/ui/badge";
 
 export default function FournisseursPage() {
-  const [factures, setFactures] = useState(getFactures());
-  const [fournisseurs, setFournisseurs] = useState(getFournisseurs());
+  const [factures, setFactures] = useState<any[]>([]);
+  const [fournisseurs, setFournisseurs] = useState<any[]>([]);
 
   useEffect(() => {
+    // Initial load
+    setFactures(getFactures());
+    setFournisseurs(getFournisseurs());
+
     const refresh = () => {
       setFactures(getFactures());
       setFournisseurs(getFournisseurs());
@@ -79,7 +83,7 @@ export default function FournisseursPage() {
                   fournisseurs.map((f: any) => (
                     <TableRow key={f.id}>
                       <TableCell className="font-bold">{f.name}</TableCell>
-                      <TableCell>{f.contact}</TableCell>
+                      <TableCell>{f.contact || "N/A"}</TableCell>
                     </TableRow>
                   ))
                 ) : (

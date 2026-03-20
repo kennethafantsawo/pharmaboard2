@@ -95,7 +95,7 @@ export default function DashboardOverview() {
           <CardDescription>Graphique basé sur vos saisies journalières (F CFA)</CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="h-[450px] flex items-center justify-center">
+          <div className="h-[450px] w-full flex items-center justify-center">
             {chartData.length > 0 ? (
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart data={chartData}>
@@ -108,7 +108,7 @@ export default function DashboardOverview() {
                 </LineChart>
               </ResponsiveContainer>
             ) : (
-              <p className="text-muted-foreground italic">Aucune donnée à afficher. Ajoutez des recettes dans l'onglet Mise à Jour.</p>
+              <p className="text-muted-foreground italic text-center">Aucune donnée à afficher. Ajoutez des recettes dans l'onglet Mise à Jour.</p>
             )}
           </div>
         </CardContent>
